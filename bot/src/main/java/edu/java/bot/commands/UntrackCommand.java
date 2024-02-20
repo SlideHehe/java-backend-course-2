@@ -29,7 +29,7 @@ public class UntrackCommand implements Command {
         Long id = update.message().chat().id();
 
         String message = update.message().text();
-        String[] commandsWithUrl = message.strip().split(" ");
+        String[] commandsWithUrl = message.split("\\s+");
 
         // [0] - /track
         // [1] - url
