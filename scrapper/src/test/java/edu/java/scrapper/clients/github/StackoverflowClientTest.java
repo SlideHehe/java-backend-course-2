@@ -24,7 +24,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-@WireMockTest(httpPort = 80)
+@WireMockTest(httpPort = 8080)
 public class StackoverflowClientTest {
     @Mock
     ApplicationConfig applicationConfig;
@@ -34,7 +34,7 @@ public class StackoverflowClientTest {
 
     @BeforeEach
     void setupConfig() {
-        when(client.stackoverflowApiUrl()).thenReturn("http://localhost");
+        when(client.stackoverflowApiUrl()).thenReturn("http://localhost:8080");
         when(applicationConfig.client()).thenReturn(client);
     }
 

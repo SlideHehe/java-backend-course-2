@@ -22,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-@WireMockTest(httpPort = 80)
+@WireMockTest(httpPort = 8080)
 public class GithubClientTest {
     @Mock
     ApplicationConfig applicationConfig;
@@ -32,7 +32,7 @@ public class GithubClientTest {
 
     @BeforeEach
     void setupConfig() {
-        when(client.githubApiUrl()).thenReturn("http://localhost");
+        when(client.githubApiUrl()).thenReturn("http://localhost:8080");
         when(applicationConfig.client()).thenReturn(client);
     }
 
