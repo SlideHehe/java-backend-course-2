@@ -12,7 +12,7 @@ public class UpdatesService {
     private final Set<LinkUpdateRequest> updateRequests = new HashSet<>(); // TODO remove when data layer is done
 
     public void createUpdate(LinkUpdateRequest linkUpdateRequest) {
-        if (updateRequests.add(linkUpdateRequest)) {
+        if (!updateRequests.add(linkUpdateRequest)) {
             throw new UpdateAlreadyExistsException("Update с переданным id уже обработан");
         }
     }
