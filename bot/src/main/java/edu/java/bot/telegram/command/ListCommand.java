@@ -6,16 +6,15 @@ import edu.java.bot.telegram.link.Link;
 import edu.java.bot.telegram.link.User;
 import edu.java.bot.telegram.link.UserRepository;
 import java.util.Set;
+
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
+@RequiredArgsConstructor
 @Component
 public class ListCommand implements Command {
     private final UserRepository userRepository;
-
-    public ListCommand(@NotNull UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
 
     @Override
     public String command() {

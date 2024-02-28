@@ -5,16 +5,15 @@ import com.pengrad.telegrambot.request.SendMessage;
 import edu.java.bot.telegram.link.User;
 import edu.java.bot.telegram.link.UserRepository;
 import java.util.Optional;
+
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
+@RequiredArgsConstructor
 @Component
 public class StartCommand implements Command {
     private final UserRepository userRepository;
-
-    public StartCommand(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
 
     @Override
     public String command() {

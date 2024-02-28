@@ -4,17 +4,15 @@ import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
 import java.util.List;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
+@RequiredArgsConstructor
 @Getter
 @Component
 public class HelpCommand implements Command {
     private final List<Command> commands;
-
-    public HelpCommand(List<Command> commands) {
-        this.commands = commands;
-    }
 
     @Override
     public String command() {

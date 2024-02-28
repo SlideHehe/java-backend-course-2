@@ -3,16 +3,14 @@ package edu.java.bot.telegram.command;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
 import edu.java.bot.telegram.linkhandler.LinkHandlerService;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
+@RequiredArgsConstructor
 @Component
 public class TrackCommand implements Command {
     private final LinkHandlerService linkHandlerService;
-
-    public TrackCommand(@NotNull LinkHandlerService linkHandlerService) {
-        this.linkHandlerService = linkHandlerService;
-    }
 
     @Override
     public String command() {

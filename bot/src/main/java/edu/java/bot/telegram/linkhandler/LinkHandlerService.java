@@ -9,18 +9,15 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
+@RequiredArgsConstructor
 @Service
 public class LinkHandlerService {
     private final List<LinkHandler> handlers;
     private final UserRepository userRepository;
-
-    public LinkHandlerService(List<LinkHandler> handlers, UserRepository userRepository) {
-        this.handlers = handlers;
-        this.userRepository = userRepository;
-    }
 
     public String untrackLink(@NotNull String pageToUntrack, @NotNull Long chatId) {
         User user = userRepository.findById(chatId).get();

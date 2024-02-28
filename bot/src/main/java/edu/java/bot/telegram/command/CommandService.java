@@ -7,19 +7,16 @@ import edu.java.bot.telegram.link.UserRepository;
 import java.util.List;
 import java.util.Optional;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
+@RequiredArgsConstructor
 @Getter
 @Service
 public class CommandService {
     private final List<Command> commands;
     private final UserRepository userRepository;
-
-    public CommandService(List<Command> commands, UserRepository userRepository) {
-        this.commands = commands;
-        this.userRepository = userRepository;
-    }
 
     public SendMessage process(@NotNull Update update) {
         Long id = update.message().chat().id();
