@@ -1,6 +1,6 @@
 package edu.java.bot.api.exception;
 
-import edu.java.bot.api.updates.dto.ApiErrorResponse;
+import edu.java.bot.api.exception.dto.ApiErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
