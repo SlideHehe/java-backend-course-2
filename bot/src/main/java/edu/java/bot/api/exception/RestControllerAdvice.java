@@ -6,35 +6,25 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import java.util.Arrays;
-
 @org.springframework.web.bind.annotation.RestControllerAdvice
 public class RestControllerAdvice {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler
     public ApiErrorResponse handleNotValidArguments(MethodArgumentNotValidException exception) {
-        return new ApiErrorResponse(
-                "Некорректные параметры запроса",
-                HttpStatus.BAD_REQUEST.toString(),
-                exception.getClass().getSimpleName(),
-                exception.getMessage(),
-                Arrays.stream(exception.getStackTrace())
-                        .map(StackTraceElement::toString)
-                        .toList()
+        return ApiErrorResponse.create(
+            "Некорректные параметры запроса",
+            HttpStatus.BAD_REQUEST.toString(),
+            exception
         );
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler
     public ApiErrorResponse handleUpdateAlreadyExists(UpdateAlreadyExistsException exception) {
-        return new ApiErrorResponse(
-                "Невозможно добавить уже существующий update",
-                HttpStatus.BAD_REQUEST.toString(),
-                exception.getClass().getSimpleName(),
-                exception.getMessage(),
-                Arrays.stream(exception.getStackTrace())
-                        .map(StackTraceElement::toString)
-                        .toList()
+        return ApiErrorResponse.create(
+            "Невозможно добавить уже существующий update",
+            HttpStatus.BAD_REQUEST.toString(),
+            exception
         );
     }
 }
