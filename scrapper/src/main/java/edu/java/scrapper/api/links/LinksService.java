@@ -44,10 +44,13 @@ public class LinksService {
     public LinkResponse removeLink(Long tgChatId, RemoveLinkRequest removeLinkRequest) {
         checkIfChatExists(tgChatId);
 
-        return trackedLinks.get(tgChatId).stream()
-            .filter(linkResponse -> linkResponse.url().equals(removeLinkRequest.link()))
+        LinkResponse linkResponse = trackedLinks.get(tgChatId).stream()
+            .filter(link -> link.url().equals(removeLinkRequest.link()))
             .findAny()
             .orElseThrow(() -> new ResourceNotFoundException("Указанная ссылка не отслеживается"));
+
+        trackedLinks.get(tgChatId).remove(linkResponse);
+        return linkResponse;
     }
 
     private void checkIfChatExists(Long tgChatId) {
