@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class TgChatService {
-    private final Set<Long> ids = new HashSet<>();
+    private final Set<Long> ids = new HashSet<>(); // TODO remove when data layer is done
 
     public void registerChat(Long id) {
         ids.add(id);
