@@ -6,7 +6,6 @@ import edu.java.bot.telegram.link.Link;
 import edu.java.bot.telegram.link.User;
 import edu.java.bot.telegram.link.UserRepository;
 import java.util.Set;
-
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;

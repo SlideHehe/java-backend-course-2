@@ -4,7 +4,6 @@ import edu.java.bot.api.exception.UpdateAlreadyExistsException;
 import edu.java.bot.api.updates.dto.LinkUpdateRequest;
 import java.util.HashSet;
 import java.util.Set;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 @Service

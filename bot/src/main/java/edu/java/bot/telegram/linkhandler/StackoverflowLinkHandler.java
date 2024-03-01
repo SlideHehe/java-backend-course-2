@@ -1,10 +1,9 @@
 package edu.java.bot.telegram.linkhandler;
 
+import java.net.URI;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
-
-import java.net.URI;
 
 @Slf4j
 @Component
@@ -17,7 +16,7 @@ public class StackoverflowLinkHandler implements LinkHandler {
     @Override
     public boolean canHandle(@NotNull URI url) {
         return url.getHost().equals(hostname())
-                && !url.getPath().isEmpty();  // TODO add check for supported api paths
+            && !url.getPath().isEmpty();  // TODO add check for supported api paths
     }
 
     @Override
