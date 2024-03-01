@@ -3,7 +3,7 @@ package edu.java.scrapper.client.github;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import edu.java.scrapper.client.ClientFactory;
 import edu.java.scrapper.client.stackoverflow.StackoverflowClient;
-import edu.java.scrapper.client.stackoverflow.StackoverflowQuestion;
+import edu.java.scrapper.client.stackoverflow.dto.StackoverflowQuestion;
 import edu.java.scrapper.configuration.ApplicationConfig;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;

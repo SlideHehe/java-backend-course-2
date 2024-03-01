@@ -2,6 +2,7 @@ package edu.java.scrapper.client.github;
 
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import edu.java.scrapper.client.ClientFactory;
+import edu.java.scrapper.client.github.dto.GithubRepository;
 import edu.java.scrapper.configuration.ApplicationConfig;
 import edu.java.scrapper.configuration.ApplicationConfig.Client;
 import java.time.OffsetDateTime;
