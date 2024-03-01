@@ -9,12 +9,14 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.codec.DecodingException;
 import org.springframework.http.MediaType;
+import org.springframework.web.reactive.function.client.WebClientException;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
@@ -39,6 +41,7 @@ public class StackoverflowClientTest {
     }
 
     @Test
+    @DisplayName("Успешный запрос")
     void getQuestionSuccess() {
         // given
         OffsetDateTime offsetDateTime = OffsetDateTime.of(2024, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC);
@@ -82,6 +85,7 @@ public class StackoverflowClientTest {
     }
 
     @Test
+    @DisplayName("Запрос с неверным телом ответа")
     void getQuestionWrongBody() {
         // given
         stubFor(get(urlPathMatching("/questions/1642028"))
@@ -94,6 +98,22 @@ public class StackoverflowClientTest {
         // when-then
         assertThatThrownBy(() -> stackoverflowClient.getQuestion(1642028L))
             .isInstanceOf(DecodingException.class);
+    }
+
+    @Test
+    @DisplayName("Запрос с клиентской ошибкой")
+    void getQuestionError() {
+        // given
+        stubFor(get(urlPathMatching("/questions/1642028"))
+            .willReturn(aResponse()
+                .withStatus(418)
+                .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+                .withBody("notjson")));
+        StackoverflowClient stackoverflowClient = ClientFactory.createStackoverflowClient(applicationConfig);
+
+        // when-then
+        assertThatThrownBy(() -> stackoverflowClient.getQuestion(1642028L))
+            .isInstanceOf(WebClientException.class);
     }
 }
 

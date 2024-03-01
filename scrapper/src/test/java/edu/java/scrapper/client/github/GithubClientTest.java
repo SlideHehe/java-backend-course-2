@@ -8,12 +8,14 @@ import edu.java.scrapper.configuration.ApplicationConfig.Client;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.codec.DecodingException;
 import org.springframework.http.MediaType;
+import org.springframework.web.reactive.function.client.WebClientException;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
@@ -38,6 +40,7 @@ public class GithubClientTest {
     }
 
     @Test
+    @DisplayName("Успешный запрос")
     void getRepositorySuccess() {
         // given
         OffsetDateTime offsetDateTime = OffsetDateTime.of(2024, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC);
@@ -71,6 +74,7 @@ public class GithubClientTest {
     }
 
     @Test
+    @DisplayName("Запрос с неверным телом ответа")
     void getRepositoryWrongBody() {
         // given
         stubFor(get(urlPathEqualTo("/repos/SlideHehe/java-backend-course-2"))
@@ -83,5 +87,21 @@ public class GithubClientTest {
         // when-then
         assertThatThrownBy(() -> githubClient.getRepository("SlideHehe", "java-backend-course-2"))
             .isInstanceOf(DecodingException.class);
+    }
+
+    @Test
+    @DisplayName("Запрос с клиентской ошибкой")
+    void getRepositoryError() {
+        // given
+        stubFor(get(urlPathEqualTo("/repos/SlideHehe/java-backend-course-2"))
+            .willReturn(aResponse()
+                .withStatus(418)
+                .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+                .withBody("{}")));
+        GithubClient githubClient = ClientFactory.createGithubclient(applicationConfig);
+
+        // when-then
+        assertThatThrownBy(() -> githubClient.getRepository("SlideHehe", "java-backend-course-2"))
+            .isInstanceOf(WebClientException.class);
     }
 }
