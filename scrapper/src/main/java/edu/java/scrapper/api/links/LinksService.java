@@ -22,7 +22,7 @@ public class LinksService {
 
         return new ListLinkResponse(
             trackedLinks.get(tgChatId).stream().toList(),
-            trackedLinks.size()
+            trackedLinks.get(tgChatId).size()
         );
     }
 
