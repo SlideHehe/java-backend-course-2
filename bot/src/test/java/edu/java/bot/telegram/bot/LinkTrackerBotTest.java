@@ -1,9 +1,10 @@
 package edu.java.bot.telegram.bot;
 
+import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
-import edu.java.bot.telegram.command.CommandService;
 import edu.java.bot.configuration.ApplicationConfig;
+import edu.java.bot.telegram.command.CommandService;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,6 +24,9 @@ public class LinkTrackerBotTest {
 
     @Mock
     ApplicationConfig applicationConfig;
+
+    @Mock
+    TelegramBot telegramBot;
 
     @InjectMocks
     LinkTrackerBot linkTrackerBot;
