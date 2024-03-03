@@ -6,15 +6,8 @@ import java.time.OffsetDateTime;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record GithubRepository(
-    Long id,
-
-    String name,
-
     @JsonAlias("html_url")
     String url,
-
-    @JsonAlias("pushed_at")
-    OffsetDateTime pushedAt,
 
     @JsonAlias("updated_at")
     OffsetDateTime updatedAt
