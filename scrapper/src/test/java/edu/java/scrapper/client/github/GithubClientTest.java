@@ -50,19 +50,13 @@ public class GithubClientTest {
                 .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
                 .withBody("""
                     {
-                        "id": 1,
-                        "name": "java-backend-course-2",
                         "html_url": "https://github.com/SlideHehe/java-backend-course-2",
-                        "pushed_at": "%s",
                         "updated_at": "%s"
                     }
-                    """.formatted(offsetDateTime, offsetDateTime))));
+                    """.formatted(offsetDateTime))));
         GithubClient githubClient = ClientFactory.createGithubclient(applicationConfig);
         GithubRepository expectedRepository = new GithubRepository(
-            1L,
-            "java-backend-course-2",
             "https://github.com/SlideHehe/java-backend-course-2",
-            offsetDateTime,
             offsetDateTime
         );
 
