@@ -51,7 +51,7 @@ public class StackoverflowClientTest {
                         "items": [
                             {
                                 "link": "https://stackoverflow.com/questions/1642028/what-is-the-operator-in-c-c",
-                                "last_activity_date": "%s",
+                                "last_activity_date": "%s"
                             }
                         ]
                     }
