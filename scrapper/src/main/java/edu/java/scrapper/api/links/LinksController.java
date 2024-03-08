@@ -22,12 +22,12 @@ public class LinksController {
     private final LinksService linksService;
 
     @GetMapping
-    ListLinkResponse getFollowedLinks(@RequestHeader("Tg-Chat-Id") @Min(1L) Long tgChatId) {
+    public ListLinkResponse getFollowedLinks(@RequestHeader("Tg-Chat-Id") @Min(1L) Long tgChatId) {
         return linksService.getFollowedLinks(tgChatId);
     }
 
     @PostMapping
-    LinkResponse addLink(
+    public LinkResponse addLink(
         @RequestHeader("Tg-Chat-Id") @Min(1L) Long tgChatId,
         @RequestBody @Valid AddLinkRequest addLinkRequest
     ) {
@@ -35,7 +35,7 @@ public class LinksController {
     }
 
     @DeleteMapping
-    LinkResponse removeLink(
+    public LinkResponse removeLink(
         @RequestHeader("Tg-Chat-Id") @Min(1L) Long tgChatId,
         @RequestBody @Valid RemoveLinkRequest removeLinkRequest
     ) {
