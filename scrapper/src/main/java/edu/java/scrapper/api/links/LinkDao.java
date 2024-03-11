@@ -2,11 +2,14 @@ package edu.java.scrapper.api.links;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 
 public interface LinkDao {
     List<Link> findAll();
 
-    Link add(URI uri);
+    Optional<Link> findById(Long id);
 
-    Link remove(Long id);
+    Optional<Link> add(URI uri);
+
+    Optional<Link> remove(Long id);
 }
