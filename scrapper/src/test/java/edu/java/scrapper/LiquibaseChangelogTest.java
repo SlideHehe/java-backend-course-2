@@ -21,7 +21,7 @@ public class LiquibaseChangelogTest extends IntegrationTest {
 
             // when-then
             assertThatNoException().isThrownBy(() -> statement.execute("select id, url, updated_at from link"));
-            assertThatNoException().isThrownBy(() -> statement.execute("select id from chat"));
+            assertThatNoException().isThrownBy(() -> statement.execute("select id, created_at from chat"));
             assertThatNoException().isThrownBy(() -> statement.execute("select chat_id, link_id from chat_link"));
         } catch (SQLException e) {
             throw new RuntimeException(e);

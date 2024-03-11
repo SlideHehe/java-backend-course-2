@@ -3,8 +3,12 @@
 --changeset SlideHehe:1
 create table chat
 (
-    id bigint primary key
+    id         bigint primary key,
+
+    created_at timestamp with time zone default current_timestamp not null
 );
+
+
 
 create table link
 (
