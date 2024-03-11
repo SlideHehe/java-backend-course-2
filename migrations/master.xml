@@ -8,4 +8,5 @@
        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
     <include file="schema.sql"/>
+    <include file="alter-table-link-1.1.sql"/>
 </databaseChangeLog>
