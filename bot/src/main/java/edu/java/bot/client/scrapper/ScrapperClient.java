@@ -16,7 +16,7 @@ public interface ScrapperClient {
     @PostExchange("/tg-chat/{id}")
     void registerChat(@PathVariable @Min(1) Long id);
 
-    @DeleteExchange("tg-chat/{id}")
+    @DeleteExchange("/tg-chat/{id}")
     void deleteChat(@PathVariable @Min(1) Long id);
 
     @GetExchange("/links")
