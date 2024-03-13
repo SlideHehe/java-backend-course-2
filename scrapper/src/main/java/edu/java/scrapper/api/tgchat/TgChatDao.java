@@ -8,7 +8,7 @@ public interface TgChatDao {
 
     Optional<TgChat> findById(Long id);
 
-    Optional<TgChat> add(Long id);
+    TgChat add(Long id);
 
-    Optional<TgChat> remove(Long id);
+    TgChat remove(Long id);
 }

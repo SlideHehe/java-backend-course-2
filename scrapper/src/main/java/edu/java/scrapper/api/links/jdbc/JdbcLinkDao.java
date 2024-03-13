@@ -32,28 +32,26 @@ public class JdbcLinkDao implements LinkDao {
     @Override
     public Optional<Link> findByUrl(URI url) {
         return jdbcClient.sql("select link.id, link.url, link.updated_at, link.checked_at from link where url = ?")
-            .param(url)
+            .param(url.toString())
             .query(Link.class)
             .optional();
     }
 
     @Override
-    public Optional<Link> add(URI url) {
-        jdbcClient.sql("insert into link (url) values (?)")
-            .param(url)
-            .update();
-
-        return findByUrl(url);
+    public Link add(URI url) {
+        return jdbcClient.sql(
+                "insert into link (url) values (?) returning link.id, link.url, link.updated_at, link.checked_at")
+            .param(url.toString())
+            .query(Link.class)
+            .single();
     }
 
     @Override
-    public Optional<Link> remove(Long id) {
-        Optional<Link> optionalLink = findById(id);
-
-        jdbcClient.sql("delete from link where id = ?")
+    public Link remove(Long id) {
+        return jdbcClient.sql(
+                "delete from link where id = ? returning link.id, link.url, link.updated_at, link.checked_at")
             .param(id)
-            .update();
-
-        return optionalLink;
+            .query(Link.class)
+            .single();
     }
 }
