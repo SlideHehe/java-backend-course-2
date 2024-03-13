@@ -20,7 +20,7 @@ public class LiquibaseChangelogTest extends IntegrationTest {
         ); Statement statement = connection.createStatement()) {
 
             // when-then
-            assertThatNoException().isThrownBy(() -> statement.execute("select id, url, updated_at from link"));
+            assertThatNoException().isThrownBy(() -> statement.execute("select id, url, updated_at, checked_at from link"));
             assertThatNoException().isThrownBy(() -> statement.execute("select id, created_at from chat"));
             assertThatNoException().isThrownBy(() -> statement.execute("select chat_id, link_id from chat_link"));
         } catch (SQLException e) {
