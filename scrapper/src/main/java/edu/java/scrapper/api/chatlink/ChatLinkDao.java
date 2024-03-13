@@ -8,7 +8,7 @@ public interface ChatLinkDao {
 
     Optional<ChatLink> findById(Long chatId, Long linkId);
 
-    Optional<ChatLink> add(Long chatId, Long linkId);
+    ChatLink add(Long chatId, Long linkId);
 
-    Optional<ChatLink> remove(Long chatId, Long linkId);
+    ChatLink remove(Long chatId, Long linkId);
 }

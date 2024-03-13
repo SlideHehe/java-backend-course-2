@@ -29,22 +29,18 @@ public class JdbcTgChatDao implements TgChatDao {
     }
 
     @Override
-    public Optional<TgChat> add(Long id) {
-        jdbcClient.sql("insert into chat (id) values (?)")
+    public TgChat add(Long id) {
+        return jdbcClient.sql("insert into chat (id) values (?) returning chat.id, chat.created_at")
             .param(id)
-            .update();
-
-        return findById(id);
+            .query(TgChat.class)
+            .single();
     }
 
     @Override
-    public Optional<TgChat> remove(Long id) {
-        Optional<TgChat> optionalTgChat = findById(id);
-
-        jdbcClient.sql("delete from chat where id = ?")
+    public TgChat remove(Long id) {
+        return jdbcClient.sql("delete from chat where id = ? returning chat.id, chat.created_at")
             .param(id)
-            .update();
-
-        return optionalTgChat;
+            .query(TgChat.class)
+            .single();
     }
 }

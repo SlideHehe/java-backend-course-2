@@ -11,7 +11,7 @@ public interface LinkDao {
 
     Optional<Link> findByUrl(URI uri);
 
-    Optional<Link> add(URI url);
+    Link add(URI url);
 
-    Optional<Link> remove(Long id);
+    Link remove(Long id);
 }

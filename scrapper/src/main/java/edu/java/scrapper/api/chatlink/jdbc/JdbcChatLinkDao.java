@@ -30,22 +30,20 @@ public class JdbcChatLinkDao implements ChatLinkDao {
     }
 
     @Override
-    public Optional<ChatLink> add(Long chatId, Long linkId) {
-        jdbcClient.sql("insert into chat_link (chat_id, link_id) values (?, ?)")
+    public ChatLink add(Long chatId, Long linkId) {
+        return jdbcClient.sql(
+                "insert into chat_link (chat_id, link_id) values (?, ?) returning chat_link.chat_id, chat_link.link_id")
             .params(chatId, linkId)
-            .update();
-
-        return findById(chatId, linkId);
+            .query(ChatLink.class)
+            .single();
     }
 
     @Override
-    public Optional<ChatLink> remove(Long chatId, Long linkId) {
-        Optional<ChatLink> optionalChatLink = findById(chatId, linkId);
-
-        jdbcClient.sql("delete  from chat_link where chat_id = ? and link_id = ?")
+    public ChatLink remove(Long chatId, Long linkId) {
+        return jdbcClient.sql(
+                "delete from chat_link where chat_id = ? and link_id = ? returning chat_link.chat_id, chat_link.link_id")
             .params(chatId, linkId)
-            .update();
-
-        return optionalChatLink;
+            .query(ChatLink.class)
+            .single();
     }
 }
