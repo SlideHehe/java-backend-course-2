@@ -1,19 +1,35 @@
-package edu.java.scrapper.api.tgchat;
+package edu.java.scrapper.api.tgchat.jdbc;
 
+import edu.java.scrapper.api.chatlink.jdbc.JdbcChatLinkDao;
 import edu.java.scrapper.api.exception.ChatAlreadyExistsException;
 import edu.java.scrapper.api.exception.ResourceNotFoundException;
+import edu.java.scrapper.api.tgchat.TgChat;
+import edu.java.scrapper.api.tgchat.TgChatService;
+import java.time.OffsetDateTime;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.when;
 
-class TgChatServiceTest {
+@ExtendWith(MockitoExtension.class)
+class JdbcTgChatServiceTest {
+    @Mock
+    JdbcTgChatDao jdbcTgChatDao;
+
+    @Mock
+    JdbcChatLinkDao jdbcChatLinkDao;
 
     @Test
     @DisplayName("Регистрация чата")
     void registerChat() {
         // given
-        TgChatService chatService = new TgChatService();
+        when(jdbcTgChatDao.findById(1L)).thenReturn(Optional.empty());
+        TgChatService chatService = new JdbcTgChatService(jdbcTgChatDao, jdbcChatLinkDao);
 
         // when-then
         assertThatNoException().isThrownBy(() -> chatService.registerChat(1L));
@@ -23,21 +39,22 @@ class TgChatServiceTest {
     @DisplayName("Регистрация уже зарегистрированного чата")
     void registerRegisteredChat() {
         // given
-        TgChatService chatService = new TgChatService();
-        chatService.registerChat(1L);
+        when(jdbcTgChatDao.findById(1L)).thenReturn(Optional.of(new TgChat(1L, OffsetDateTime.now())));
+        TgChatService chatService = new JdbcTgChatService(jdbcTgChatDao, jdbcChatLinkDao);
 
         // when-then
         assertThatThrownBy(() -> chatService.registerChat(1L))
             .isInstanceOf(ChatAlreadyExistsException.class)
-            .hasMessage("Указанный чат уже зарегестрирован");
+            .hasMessage("Указанный чат уже зарегистрирован");
     }
 
     @Test
     @DisplayName("Удаление чата")
     void deleteChat() {
         // given
-        TgChatService chatService = new TgChatService();
-        chatService.registerChat(1L);
+        when(jdbcTgChatDao.findById(1L)).thenReturn(Optional.of(new TgChat(1L, OffsetDateTime.now())));
+        TgChatService chatService = new JdbcTgChatService(jdbcTgChatDao, jdbcChatLinkDao);
+        chatService.deleteChat(1L);
 
         // when-then
         assertThatNoException().isThrownBy(() -> chatService.deleteChat(1L));
@@ -47,7 +64,8 @@ class TgChatServiceTest {
     @DisplayName("Удаление незарегистрированного чата")
     void deleteNonRegisteredChat() {
         // given
-        TgChatService chatService = new TgChatService();
+        when(jdbcTgChatDao.findById(1L)).thenReturn(Optional.empty());
+        TgChatService chatService = new JdbcTgChatService(jdbcTgChatDao, jdbcChatLinkDao);
 
         // when-then
         assertThatThrownBy(() -> chatService.deleteChat(1L))

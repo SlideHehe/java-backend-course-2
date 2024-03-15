@@ -54,4 +54,12 @@ public class JdbcLinkDao implements LinkDao {
             .query(Link.class)
             .single();
     }
+
+    public List<Link> findAllByChatId(Long chatId) {
+        return jdbcClient.sql("select link.id, link.url, link.updated_at, link.checked_at "
+                + "from link join chat_link on chat_link.link_id = link.id where chat_link.chat_id = ?")
+            .param(chatId)
+            .query(Link.class)
+            .list();
+    }
 }

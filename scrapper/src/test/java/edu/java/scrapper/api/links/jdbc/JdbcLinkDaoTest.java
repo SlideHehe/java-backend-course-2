@@ -173,4 +173,32 @@ class JdbcLinkDaoTest extends IntegrationTest {
         // when-then
         assertThatThrownBy(() -> jdbcLinkDao.remove(1L)).isInstanceOf(EmptyResultDataAccessException.class);
     }
+
+    @Test
+    @Transactional
+    @Rollback
+    @DisplayName("Получение ссылок, отслеживаемых пользователем")
+    void findAllByChatId() {
+        // given
+        OffsetDateTime time = OffsetDateTime.parse("2024-03-13T18:27:34.389Z");
+        jdbcClient.sql("insert into link (id, url, updated_at, checked_at) values "
+            +
+            "(1, 'https://aboba1.com', timestamp with time zone '2024-03-13T18:27:34.389Z', timestamp with time zone '2024-03-13T18:27:34.389Z'),"
+            +
+            "(2, 'https://aboba2.com', timestamp with time zone '2024-03-13T18:27:34.389Z', timestamp with time zone '2024-03-13T18:27:34.389Z')"
+        ).update();
+        jdbcClient.sql("insert into chat (id) values (1), (2);").update();
+        jdbcClient.sql("insert into chat_link (chat_id, link_id) values (1, 1);").update();
+        jdbcClient.sql("insert into chat_link (chat_id, link_id) values (2, 1);").update();
+        jdbcClient.sql("insert into chat_link (chat_id, link_id) values (2, 2);").update();
+        List<Link> expectedList = List.of(
+            new Link(1L, URI.create("https://aboba1.com"), time, time)
+        );
+
+        // when
+        List<Link> actualList = jdbcLinkDao.findAllByChatId(1L);
+
+        // then
+        assertThat(actualList).isEqualTo(expectedList);
+    }
 }

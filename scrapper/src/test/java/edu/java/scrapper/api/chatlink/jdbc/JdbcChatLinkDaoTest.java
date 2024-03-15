@@ -147,4 +147,21 @@ class JdbcChatLinkDaoTest extends IntegrationTest {
         // when-then
         assertThatThrownBy(() -> jdbcChatLinkDao.remove(1L, 1L)).isInstanceOf(EmptyResultDataAccessException.class);
     }
+
+    @Test
+    @Transactional
+    @Rollback
+    @DisplayName("Удаление неотслеживаемых никем ссылок")
+    void removeDanglingLinks() {
+        // given
+        jdbcClient.sql("insert into link (id, url) values (1, 'https://aboba1.com')").update();
+
+        // when
+        jdbcChatLinkDao.removeDanglingLinks();
+
+        // then
+        Boolean result = jdbcClient.sql("select exists(select 1 from link)")
+            .query(Boolean.class).single();
+        assertThat(result).isFalse();
+    }
 }
