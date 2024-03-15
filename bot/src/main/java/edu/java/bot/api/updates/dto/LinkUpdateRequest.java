@@ -8,9 +8,6 @@ import java.net.URI;
 import java.util.List;
 
 public record LinkUpdateRequest(
-    @Min(1L)
-    Long id,
-
     @NotNull
     URI url,
 
