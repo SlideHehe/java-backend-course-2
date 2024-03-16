@@ -16,6 +16,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -24,12 +25,15 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class JdbcLinksServiceTest {
+class JdbcLinkServiceTest {
     @Mock
     JdbcLinkDao jdbcLinkDao;
 
     @Mock
     JdbcChatLinkDao jdbcChatLinkDao;
+
+    @InjectMocks
+    JdbcLinkService linkService;
 
     @Test
     @DisplayName("Получение отслеживаемых ссылок")
@@ -41,7 +45,6 @@ class JdbcLinksServiceTest {
             new Link(2L, URI.create("https://aboba.com/2"), time, time),
             new Link(3L, URI.create("https://aboba.com/3"), time, time)
         ));
-        JdbcLinkService linksService = new JdbcLinkService(jdbcLinkDao, jdbcChatLinkDao);
         ListLinkResponse expectedResponse = new ListLinkResponse(
             List.of(
                 new LinkResponse(1L, URI.create("https://aboba.com/1")),
@@ -52,7 +55,7 @@ class JdbcLinksServiceTest {
         );
 
         // when
-        ListLinkResponse actualResponse = linksService.getFollowedLinks(1L);
+        ListLinkResponse actualResponse = linkService.getFollowedLinks(1L);
 
         // then
         assertThat(actualResponse).isEqualTo(expectedResponse);
@@ -63,11 +66,10 @@ class JdbcLinksServiceTest {
     void getFollowedLinksForNonExistingChat() {
         // given
         when(jdbcLinkDao.findAllByChatId(1L)).thenReturn(List.of());
-        JdbcLinkService linksService = new JdbcLinkService(jdbcLinkDao, jdbcChatLinkDao);
         ListLinkResponse expectedList = new ListLinkResponse(List.of(), 0);
 
         // when
-        ListLinkResponse actualList = linksService.getFollowedLinks(1L);
+        ListLinkResponse actualList = linkService.getFollowedLinks(1L);
 
         // then
         assertThat(actualList).isEqualTo(expectedList);
@@ -82,11 +84,10 @@ class JdbcLinksServiceTest {
         when(jdbcLinkDao.add(uri)).thenReturn(new Link(1L, uri, OffsetDateTime.now(), OffsetDateTime.now()));
         when(jdbcChatLinkDao.findById(1L, 1L)).thenReturn(Optional.empty());
         when(jdbcChatLinkDao.add(1L, 1L)).thenReturn(new ChatLink(1L, 1L));
-        JdbcLinkService linksService = new JdbcLinkService(jdbcLinkDao, jdbcChatLinkDao);
         LinkResponse expectedResponse = new LinkResponse(1L, uri);
 
         // when
-        LinkResponse actualResponse = linksService.addLink(1L, new AddLinkRequest(uri));
+        LinkResponse actualResponse = linkService.addLink(1L, new AddLinkRequest(uri));
 
         // then
         assertThat(actualResponse).isEqualTo(expectedResponse);
@@ -100,11 +101,10 @@ class JdbcLinksServiceTest {
         when(jdbcLinkDao.findByUrl(uri)).thenReturn(Optional.empty());
         when(jdbcLinkDao.add(uri)).thenReturn(new Link(1L, uri, OffsetDateTime.now(), OffsetDateTime.now()));
         when(jdbcChatLinkDao.findById(1L, 1L)).thenReturn(Optional.of(new ChatLink(1L, 1L)));
-        JdbcLinkService linksService = new JdbcLinkService(jdbcLinkDao, jdbcChatLinkDao);
         AddLinkRequest addLinkRequest = new AddLinkRequest(uri);
 
         // when-then
-        assertThatThrownBy(() -> linksService.addLink(1L, addLinkRequest))
+        assertThatThrownBy(() -> linkService.addLink(1L, addLinkRequest))
             .isInstanceOf(LinkAlreadyExistsException.class)
             .hasMessage("Переданная ссылка уже отслеживается");
     }
@@ -118,11 +118,10 @@ class JdbcLinksServiceTest {
         when(jdbcLinkDao.add(uri)).thenReturn(new Link(1L, uri, OffsetDateTime.now(), OffsetDateTime.now()));
         when(jdbcChatLinkDao.findById(1L, 1L)).thenReturn(Optional.empty());
         when(jdbcChatLinkDao.add(1L, 1L)).thenThrow(DataIntegrityViolationException.class);
-        JdbcLinkService linksService = new JdbcLinkService(jdbcLinkDao, jdbcChatLinkDao);
         AddLinkRequest addLinkRequest = new AddLinkRequest(uri);
 
         // when-then
-        assertThatThrownBy(() -> linksService.addLink(1L, addLinkRequest))
+        assertThatThrownBy(() -> linkService.addLink(1L, addLinkRequest))
             .isInstanceOf(ResourceNotFoundException.class)
             .hasMessage("Указанный чат не зарегистрирован");
     }
@@ -140,12 +139,10 @@ class JdbcLinksServiceTest {
         )));
         when(jdbcChatLinkDao.findById(1L, 1L)).thenReturn(Optional.of(new ChatLink(1L, 1L)));
         when(jdbcChatLinkDao.remove(1L, 1L)).thenReturn(new ChatLink(1L, 1L));
-        JdbcLinkService linksService = new JdbcLinkService(jdbcLinkDao, jdbcChatLinkDao);
         LinkResponse expectedResponse = new LinkResponse(1L, uri);
 
         // when
-        LinkResponse actualResponse =
-            linksService.removeLink(1L, new RemoveLinkRequest(uri));
+        LinkResponse actualResponse = linkService.removeLink(1L, new RemoveLinkRequest(uri));
 
         // then
         assertThat(actualResponse).isEqualTo(expectedResponse);
@@ -156,10 +153,9 @@ class JdbcLinksServiceTest {
     void removeNonExistingLink() {
         // given
         URI uri = URI.create("https://aboba.com");
-        when(jdbcLinkDao.findByUrl(uri)).thenReturn(Optional.empty());
-        JdbcLinkService linksService = new JdbcLinkService(jdbcLinkDao, jdbcChatLinkDao);
+        when(jdbcLinkDao.findByUrl(uri)).thenReturn(Optional.empty());;
         // when-then
-        assertThatThrownBy(() -> linksService.removeLink(1L, new RemoveLinkRequest(uri)))
+        assertThatThrownBy(() -> linkService.removeLink(1L, new RemoveLinkRequest(uri)))
             .isInstanceOf(ResourceNotFoundException.class)
             .hasMessage("Указанная не существует в системе");
     }
@@ -176,9 +172,8 @@ class JdbcLinksServiceTest {
             OffsetDateTime.now()
         )));
         when(jdbcChatLinkDao.findById(1L, 1L)).thenReturn(Optional.empty());
-        JdbcLinkService linksService = new JdbcLinkService(jdbcLinkDao, jdbcChatLinkDao);
         // when-then
-        assertThatThrownBy(() -> linksService.removeLink(1L, new RemoveLinkRequest(uri)))
+        assertThatThrownBy(() -> linkService.removeLink(1L, new RemoveLinkRequest(uri)))
             .isInstanceOf(ResourceNotFoundException.class)
             .hasMessage("Указанная ссылка не отслеживается");
     }

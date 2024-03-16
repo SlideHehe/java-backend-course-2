@@ -1,6 +1,5 @@
 package edu.java.bot.api.updates;
 
-import com.pengrad.telegrambot.request.SendMessage;
 import edu.java.bot.api.updates.dto.LinkUpdate;
 import edu.java.bot.api.updates.dto.LinkUpdateRequest;
 
