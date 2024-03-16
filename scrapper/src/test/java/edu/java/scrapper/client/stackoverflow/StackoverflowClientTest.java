@@ -52,26 +52,16 @@ public class StackoverflowClientTest {
                     {
                         "items": [
                             {
-                                "question_id": 1642028,
                                 "link": "https://stackoverflow.com/questions/1642028/what-is-the-operator-in-c-c",
-                                "title": "What is the &#39;--&gt;&#39; operator in C/C++?",
-                                "answer_count": 26,
-                                "is_answered": true,
-                                "last_activity_date": "%s",
-                                "last_edit_date": "%s"
+                                "last_activity_date": "%s"
                             }
                         ]
                     }
-                    """.formatted(offsetDateTime, offsetDateTime))));
+                    """.formatted(offsetDateTime))));
         StackoverflowClient stackoverflowClient = ClientFactory.createStackoverflowClient(applicationConfig);
         StackoverflowQuestion expectedQuestion = new StackoverflowQuestion(
             List.of(new StackoverflowQuestion.Item(
-                1642028L,
                 "https://stackoverflow.com/questions/1642028/what-is-the-operator-in-c-c",
-                "What is the &#39;--&gt;&#39; operator in C/C++?",
-                26,
-                true,
-                offsetDateTime,
                 offsetDateTime
             ))
         );
