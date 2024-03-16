@@ -201,4 +201,67 @@ class JdbcLinkDaoTest extends IntegrationTest {
         // then
         assertThat(actualList).isEqualTo(expectedList);
     }
+
+    @Test
+    @Transactional
+    @Rollback
+    @DisplayName("Проверка обновления времени")
+    void updateUpdatedTimestamp() {
+        // given
+        jdbcClient.sql(
+                "insert into link (id, url, checked_at) values (1, 'https://aboba.com', '2024-03-13T18:27:34.389Z')")
+            .update();
+
+        // when
+        Link link = jdbcLinkDao.updateUpdatedTimestamp(
+            1L,
+            OffsetDateTime.parse("2024-03-15T18:27:34.389Z")
+        );
+
+        // then
+        assertThat(link.updatedAt()).isEqualTo(OffsetDateTime.parse("2024-03-15T18:27:34.389Z"));
+        assertThat(link.checkedAt()).isNotEqualTo(OffsetDateTime.parse("2024-03-13T18:27:34.389Z"));
+    }
+
+    @Test
+    @Transactional
+    @Rollback
+    @DisplayName("Проверка получения ссылок, которые проверялись последний раз N секунд назад")
+    void findCheckedMoreThanSomeSecondsAgo() {
+        // given
+        OffsetDateTime time = OffsetDateTime.now();
+        jdbcClient.sql("insert into link (id, url, updated_at, checked_at) values "
+            + "(1, 'https://aboba1.com', ?, ?),"
+            + "(2, 'https://aboba2.com', ?, ?)"
+        ).params(time, time.minusMinutes(10), time, time).update();
+
+        // when
+        List<Link> actualList = jdbcLinkDao.findCheckedMoreThanSomeSecondsAgo(500L);
+
+        // then
+        assertThat(actualList.getFirst().url()).isEqualTo(URI.create("https://aboba1.com"));
+        assertThat(actualList.size()).isEqualTo(1);
+    }
+
+    @Test
+    @Transactional
+    @Rollback
+    @DisplayName("Проверка обновления поля checked_at")
+    void updateCheckedTimestamp() {
+        // given
+        OffsetDateTime time = OffsetDateTime.now().minusDays(1);
+        jdbcClient.sql("insert into link (id, url, checked_at) values "
+            + "(1, 'https://aboba1.com', ?),"
+            + "(2, 'https://aboba2.com', ?)"
+        ).params(time, time).update();
+
+        // when
+        List<Link> actualList = jdbcLinkDao.updateCheckedTimestamp(List.of(1L, 2L));
+
+        // then
+        assertThat(actualList.getFirst().url()).isEqualTo(URI.create("https://aboba1.com"));
+        assertThat(actualList.getFirst().updatedAt()).isNotEqualTo(time);
+        assertThat(actualList.get(1).url()).isEqualTo(URI.create("https://aboba2.com"));
+        assertThat(actualList.get(1).updatedAt()).isNotEqualTo(time);
+    }
 }

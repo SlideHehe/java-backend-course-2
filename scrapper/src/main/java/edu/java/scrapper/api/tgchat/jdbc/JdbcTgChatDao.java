@@ -21,6 +21,16 @@ public class JdbcTgChatDao implements TgChatDao {
     }
 
     @Override
+    public List<TgChat> findAllByLinkId(Long linkId) {
+        return jdbcClient.sql(
+                "select chat.id, chat.created_at from chat join chat_link on chat.id = chat_link.chat_id "
+                    + "where chat_link.link_id = ?")
+            .param(linkId)
+            .query(TgChat.class)
+            .list();
+    }
+
+    @Override
     public Optional<TgChat> findById(Long id) {
         return jdbcClient.sql("select chat.id, chat.created_at from chat where id = ?")
             .param(id)

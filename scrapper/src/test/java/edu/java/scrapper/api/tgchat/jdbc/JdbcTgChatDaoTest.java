@@ -137,4 +137,31 @@ class JdbcTgChatDaoTest extends IntegrationTest {
         // when-then
         assertThatThrownBy(() -> jdbcTgChatDao.remove(1L)).isInstanceOf(EmptyResultDataAccessException.class);
     }
+
+    @Test
+    @Transactional
+    @Rollback
+    @DisplayName("Получение ссылок, отслеживаемых пользователем")
+    void findAllByLinkId() {
+        // given
+        OffsetDateTime time = OffsetDateTime.parse("2024-03-13T18:27:34.389Z");
+        jdbcClient.sql("insert into link (id, url) values "
+            + "(1, 'https://aboba1.com'), (2, 'https://aboba2.com')"
+        ).update();
+        jdbcClient.sql("insert into chat (id, created_at) values "
+            + "(1, timestamp with time zone '2024-03-13T18:27:34.389Z'), "
+            + "(2, timestamp with time zone '2024-03-13T18:27:34.389Z');").update();
+        jdbcClient.sql("insert into chat_link (chat_id, link_id) values (1, 1);").update();
+        jdbcClient.sql("insert into chat_link (chat_id, link_id) values (1, 2);").update();
+        jdbcClient.sql("insert into chat_link (chat_id, link_id) values (2, 2);").update();
+        List<TgChat> expectedList = List.of(
+            new TgChat(1L, time)
+        );
+
+        // when
+        List<TgChat> actualList = jdbcTgChatDao.findAllByLinkId(1L);
+
+        // then
+        assertThat(actualList).isEqualTo(expectedList);
+    }
 }
