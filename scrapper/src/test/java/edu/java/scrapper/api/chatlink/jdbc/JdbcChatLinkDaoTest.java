@@ -29,10 +29,10 @@ class JdbcChatLinkDaoTest extends IntegrationTest {
     @DisplayName("Поиск всех записей")
     void findAll() {
         // given
-        jdbcClient.sql("insert into link (id, url) values "
-            + "(1, 'https://aboba1.com'),"
-            + "(2, 'https://aboba2.com'),"
-            + "(3, 'https://aboba3.com')"
+        jdbcClient.sql("insert into link (id, url, type) values "
+                       + "(1, 'https://aboba1.com', 'GITHUB'),"
+                       + "(2, 'https://aboba2.com', 'GITHUB'),"
+                       + "(3, 'https://aboba3.com', 'GITHUB')"
         ).update();
         jdbcClient.sql("insert into chat (id) values (1), (2), (3);").update();
         jdbcClient.sql("insert into chat_link (chat_id, link_id) values (1, 1), (2, 2), (3, 3);").update();
@@ -64,9 +64,9 @@ class JdbcChatLinkDaoTest extends IntegrationTest {
     @DisplayName("Поиск записи по первичному ключу")
     void findById() {
         // given
-        jdbcClient.sql("insert into link (id, url) values "
-            + "(1, 'https://aboba1.com'),"
-            + "(2, 'https://aboba2.com')"
+        jdbcClient.sql("insert into link (id, url, type) values "
+                       + "(1, 'https://aboba1.com', 'GITHUB'),"
+                       + "(2, 'https://aboba2.com', 'GITHUB')"
         ).update();
         jdbcClient.sql("insert into chat (id) values (1), (2);").update();
         jdbcClient.sql("insert into chat_link (chat_id, link_id) values (1, 1), (2, 2);").update();
@@ -94,7 +94,7 @@ class JdbcChatLinkDaoTest extends IntegrationTest {
     @DisplayName("Добавление элемента")
     void add() {
         // given
-        jdbcClient.sql("insert into link (id, url) values (1, 'https://aboba1.com')").update();
+        jdbcClient.sql("insert into link (id, url, type) values (1, 'https://aboba1.com', 'GITHUB')").update();
         jdbcClient.sql("insert into chat (id) values (1);").update();
 
         // when
@@ -112,7 +112,7 @@ class JdbcChatLinkDaoTest extends IntegrationTest {
     @DisplayName("Повторное добавление записи")
     void addExistingRecord() {
         // given
-        jdbcClient.sql("insert into link (id, url) values (1, 'https://aboba1.com')").update();
+        jdbcClient.sql("insert into link (id, url, type) values (1, 'https://aboba1.com', 'GITHUB')").update();
         jdbcClient.sql("insert into chat (id) values (1);").update();
         jdbcChatLinkDao.add(1L, 1L);
 
@@ -126,7 +126,7 @@ class JdbcChatLinkDaoTest extends IntegrationTest {
     @DisplayName("Удаление записи")
     void remove() {
         // given
-        jdbcClient.sql("insert into link (id, url) values (1, 'https://aboba1.com')").update();
+        jdbcClient.sql("insert into link (id, url, type) values (1, 'https://aboba1.com', 'GITHUB')").update();
         jdbcClient.sql("insert into chat (id) values (1);").update();
         jdbcClient.sql("insert into chat_link (chat_id, link_id) values (1, 1);").update();
 
@@ -154,7 +154,7 @@ class JdbcChatLinkDaoTest extends IntegrationTest {
     @DisplayName("Удаление неотслеживаемых никем ссылок")
     void removeDanglingLinks() {
         // given
-        jdbcClient.sql("insert into link (id, url) values (1, 'https://aboba1.com')").update();
+        jdbcClient.sql("insert into link (id, url, type) values (1, 'https://aboba1.com', 'GITHUB')").update();
 
         // when
         jdbcChatLinkDao.removeDanglingLinks();

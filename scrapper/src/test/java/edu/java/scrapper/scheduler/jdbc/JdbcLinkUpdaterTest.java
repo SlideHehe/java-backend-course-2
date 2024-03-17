@@ -1,6 +1,7 @@
 package edu.java.scrapper.scheduler.jdbc;
 
 import edu.java.scrapper.api.links.Link;
+import edu.java.scrapper.api.links.Type;
 import edu.java.scrapper.api.links.jdbc.JdbcLinkDao;
 import edu.java.scrapper.api.tgchat.jdbc.JdbcTgChatDao;
 import edu.java.scrapper.client.bot.BotClient;
@@ -40,14 +41,24 @@ class JdbcLinkUpdaterTest {
         URI uri = URI.create("https://aboba.com");
         OffsetDateTime time = OffsetDateTime.now();
         List<Link> links = List.of(
-            new Link(1L, uri, time, time),
-            new Link(2L, uri, time, time),
-            new Link(3L, uri, time, time)
+            new Link(1L, uri, time, time, Type.GITHUB, null, null, null, null),
+            new Link(2L, uri, time, time, Type.GITHUB, null, null, null, null),
+            new Link(3L, uri, time, time, Type.GITHUB, null, null, null, null)
         );
         Duration duration = Duration.ofSeconds(10L);
         when(applicationConfig.scheduler()).thenReturn(new ApplicationConfig.Scheduler(false, duration, duration));
         when(jdbcLinkDao.findCheckedMoreThanSomeSecondsAgo(10L)).thenReturn(links);
-        when(githubResourceUpdater.supports(new Link(1L, uri, time, time))).thenReturn(true);
+        when(githubResourceUpdater.supports(new Link(
+            1L,
+            uri,
+            time,
+            time,
+            Type.GITHUB,
+            null,
+            null,
+            null,
+            null
+        ))).thenReturn(true);
         JdbcLinkUpdater linkUpdater = new JdbcLinkUpdater(
             jdbcTgChatDao,
             jdbcLinkDao,

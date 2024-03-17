@@ -14,11 +14,15 @@ public interface LinkDao {
 
     Optional<Link> findByUrl(URI uri);
 
-    Link add(URI url);
+    Link add(URI url, Type type);
 
     Link updateUpdatedTimestamp(Long id, OffsetDateTime updatedAt);
 
     List<Link> updateCheckedTimestamp(List<Long> ids);
+
+    Link updateStackoverflowLink(Long id, Integer answerCount, Integer commentCount);
+
+    Link updateGithubLink(Long id, Integer pullRequestCount, Integer commitCount);
 
     Link remove(Long id);
 

@@ -145,8 +145,8 @@ class JdbcTgChatDaoTest extends IntegrationTest {
     void findAllByLinkId() {
         // given
         OffsetDateTime time = OffsetDateTime.parse("2024-03-13T18:27:34.389Z");
-        jdbcClient.sql("insert into link (id, url) values "
-            + "(1, 'https://aboba1.com'), (2, 'https://aboba2.com')"
+        jdbcClient.sql("insert into link (id, url, type) values "
+                       + "(1, 'https://aboba1.com', 'GITHUB'), (2, 'https://aboba2.com', 'GITHUB')"
         ).update();
         jdbcClient.sql("insert into chat (id, created_at) values "
             + "(1, timestamp with time zone '2024-03-13T18:27:34.389Z'), "

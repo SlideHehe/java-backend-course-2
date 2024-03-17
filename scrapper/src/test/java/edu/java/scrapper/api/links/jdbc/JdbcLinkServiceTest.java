@@ -5,6 +5,7 @@ import edu.java.scrapper.api.chatlink.jdbc.JdbcChatLinkDao;
 import edu.java.scrapper.api.exception.LinkAlreadyExistsException;
 import edu.java.scrapper.api.exception.ResourceNotFoundException;
 import edu.java.scrapper.api.links.Link;
+import edu.java.scrapper.api.links.Type;
 import edu.java.scrapper.api.links.dto.AddLinkRequest;
 import edu.java.scrapper.api.links.dto.LinkResponse;
 import edu.java.scrapper.api.links.dto.ListLinkResponse;
@@ -41,15 +42,15 @@ class JdbcLinkServiceTest {
         // given
         OffsetDateTime time = OffsetDateTime.now();
         when(jdbcLinkDao.findAllByChatId(1L)).thenReturn(List.of(
-            new Link(1L, URI.create("https://aboba.com/1"), time, time),
-            new Link(2L, URI.create("https://aboba.com/2"), time, time),
-            new Link(3L, URI.create("https://aboba.com/3"), time, time)
+            new Link(1L, URI.create("https://github.com/1"), time, time, Type.GITHUB, null, null, null, null),
+            new Link(2L, URI.create("https://github.com/2"), time, time, Type.GITHUB, null, null, null, null),
+            new Link(3L, URI.create("https://github.com/3"), time, time, Type.GITHUB, null, null, null, null)
         ));
         ListLinkResponse expectedResponse = new ListLinkResponse(
             List.of(
-                new LinkResponse(1L, URI.create("https://aboba.com/1")),
-                new LinkResponse(2L, URI.create("https://aboba.com/2")),
-                new LinkResponse(3L, URI.create("https://aboba.com/3"))
+                new LinkResponse(1L, URI.create("https://github.com/1")),
+                new LinkResponse(2L, URI.create("https://github.com/2")),
+                new LinkResponse(3L, URI.create("https://github.com/3"))
             ),
             3
         );
@@ -79,9 +80,19 @@ class JdbcLinkServiceTest {
     @DisplayName("Проверка добавления ссылки")
     void addLink() {
         // given
-        URI uri = URI.create("https://aboba.com");
+        URI uri = URI.create("https://github.com");
         when(jdbcLinkDao.findByUrl(uri)).thenReturn(Optional.empty());
-        when(jdbcLinkDao.add(uri)).thenReturn(new Link(1L, uri, OffsetDateTime.now(), OffsetDateTime.now()));
+        when(jdbcLinkDao.add(uri, Type.GITHUB)).thenReturn(new Link(
+            1L,
+            uri,
+            OffsetDateTime.now(),
+            OffsetDateTime.now(),
+            Type.GITHUB,
+            null,
+            null,
+            null,
+            null
+        ));
         when(jdbcChatLinkDao.findById(1L, 1L)).thenReturn(Optional.empty());
         when(jdbcChatLinkDao.add(1L, 1L)).thenReturn(new ChatLink(1L, 1L));
         LinkResponse expectedResponse = new LinkResponse(1L, uri);
@@ -97,9 +108,19 @@ class JdbcLinkServiceTest {
     @DisplayName("Проверка добавления уже существующей ссылки")
     void addLinkRepeated() {
         // given
-        URI uri = URI.create("https://aboba.com");
+        URI uri = URI.create("https://github.com");
         when(jdbcLinkDao.findByUrl(uri)).thenReturn(Optional.empty());
-        when(jdbcLinkDao.add(uri)).thenReturn(new Link(1L, uri, OffsetDateTime.now(), OffsetDateTime.now()));
+        when(jdbcLinkDao.add(uri, Type.GITHUB)).thenReturn(new Link(
+            1L,
+            uri,
+            OffsetDateTime.now(),
+            OffsetDateTime.now(),
+            Type.GITHUB,
+            null,
+            null,
+            null,
+            null
+        ));
         when(jdbcChatLinkDao.findById(1L, 1L)).thenReturn(Optional.of(new ChatLink(1L, 1L)));
         AddLinkRequest addLinkRequest = new AddLinkRequest(uri);
 
@@ -113,9 +134,19 @@ class JdbcLinkServiceTest {
     @DisplayName("Проверка добавления ссылки для незарегистрированного чата")
     void addLinkUnregistered() {
         // given
-        URI uri = URI.create("https://aboba.com");
+        URI uri = URI.create("https://github.com");
         when(jdbcLinkDao.findByUrl(uri)).thenReturn(Optional.empty());
-        when(jdbcLinkDao.add(uri)).thenReturn(new Link(1L, uri, OffsetDateTime.now(), OffsetDateTime.now()));
+        when(jdbcLinkDao.add(uri, Type.GITHUB)).thenReturn(new Link(
+            1L,
+            uri,
+            OffsetDateTime.now(),
+            OffsetDateTime.now(),
+            Type.GITHUB,
+            null,
+            null,
+            null,
+            null
+        ));
         when(jdbcChatLinkDao.findById(1L, 1L)).thenReturn(Optional.empty());
         when(jdbcChatLinkDao.add(1L, 1L)).thenThrow(DataIntegrityViolationException.class);
         AddLinkRequest addLinkRequest = new AddLinkRequest(uri);
@@ -130,12 +161,17 @@ class JdbcLinkServiceTest {
     @DisplayName("Проверка удаления ссылки")
     void removeLink() {
         // given
-        URI uri = URI.create("https://aboba.com");
+        URI uri = URI.create("https://github.com");
         when(jdbcLinkDao.findByUrl(uri)).thenReturn(Optional.of(new Link(
             1L,
             uri,
             OffsetDateTime.now(),
-            OffsetDateTime.now()
+            OffsetDateTime.now(),
+            Type.GITHUB,
+            null,
+            null,
+            null,
+            null
         )));
         when(jdbcChatLinkDao.findById(1L, 1L)).thenReturn(Optional.of(new ChatLink(1L, 1L)));
         when(jdbcChatLinkDao.remove(1L, 1L)).thenReturn(new ChatLink(1L, 1L));
@@ -152,8 +188,9 @@ class JdbcLinkServiceTest {
     @DisplayName("Проверка удаления несуществующей ссылки")
     void removeNonExistingLink() {
         // given
-        URI uri = URI.create("https://aboba.com");
-        when(jdbcLinkDao.findByUrl(uri)).thenReturn(Optional.empty());;
+        URI uri = URI.create("https://github.com");
+        when(jdbcLinkDao.findByUrl(uri)).thenReturn(Optional.empty());
+        ;
         // when-then
         assertThatThrownBy(() -> linkService.removeLink(1L, new RemoveLinkRequest(uri)))
             .isInstanceOf(ResourceNotFoundException.class)
@@ -164,12 +201,17 @@ class JdbcLinkServiceTest {
     @DisplayName("Проверка удаления неотслеживаемой ссылки")
     void removeNonTrackedLink() {
         // given
-        URI uri = URI.create("https://aboba.com");
+        URI uri = URI.create("https://github.com");
         when(jdbcLinkDao.findByUrl(uri)).thenReturn(Optional.of(new Link(
             1L,
             uri,
             OffsetDateTime.now(),
-            OffsetDateTime.now()
+            OffsetDateTime.now(),
+            Type.GITHUB,
+            null,
+            null,
+            null,
+            null
         )));
         when(jdbcChatLinkDao.findById(1L, 1L)).thenReturn(Optional.empty());
         // when-then

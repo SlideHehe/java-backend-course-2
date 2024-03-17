@@ -9,4 +9,5 @@
 
     <include file="schema.sql"/>
     <include file="alter-table-link-1.1.sql"/>
+    <include file="link-table-inheritance-2.0.sql"/>
 </databaseChangeLog>

@@ -1,6 +1,7 @@
 package edu.java.scrapper.scheduler.resourceupdater;
 
 import edu.java.scrapper.api.links.Link;
+import edu.java.scrapper.api.links.Type;
 import edu.java.scrapper.client.stackoverflow.StackoverflowClient;
 import edu.java.scrapper.client.stackoverflow.dto.StackoverflowQuestion;
 import edu.java.scrapper.scheduler.UpdateInfo;
@@ -34,7 +35,12 @@ class StackoverflowResourceUpdaterTest {
             URI.create(
                 "https://stackoverflow.com/questions/61719589/do-you-need-to-override-hashcode-and-equals-for-records"),
             time,
-            time
+            time,
+            Type.STACKOVERFLOW,
+            null,
+            null,
+            null,
+            null
         );
 
         // when-then
@@ -46,7 +52,17 @@ class StackoverflowResourceUpdaterTest {
     void supportsFalse() {
         // given
         OffsetDateTime time = OffsetDateTime.now();
-        Link link = new Link(1L, URI.create("https://stackoverflow.com/users"), time, time);
+        Link link = new Link(
+            1L,
+            URI.create("https://stackoverflow.com/users"),
+            time,
+            time,
+            Type.STACKOVERFLOW,
+            null,
+            null,
+            null,
+            null
+        );
 
         // when-then
         assertThat(stackoverflowResourceUpdater.supports(link)).isFalse();
@@ -59,7 +75,7 @@ class StackoverflowResourceUpdaterTest {
         OffsetDateTime time = OffsetDateTime.now();
         URI uri = URI.create(
             "https://stackoverflow.com/questions/61719589/do-you-need-to-override-hashcode-and-equals-for-records");
-        Link link = new Link(1L, uri, time.minusMinutes(10), time);
+        Link link = new Link(1L, uri, time.minusMinutes(10), time, Type.STACKOVERFLOW, null, null, null, null);
         StackoverflowQuestion question = new StackoverflowQuestion(List.of(new StackoverflowQuestion.Item(
             "https://stackoverflow.com/questions/61719589/do-you-need-to-override-hashcode-and-equals-for-records",
             time
@@ -82,7 +98,7 @@ class StackoverflowResourceUpdaterTest {
         OffsetDateTime time = OffsetDateTime.now();
         URI uri = URI.create(
             "https://stackoverflow.com/questions/61719589/do-you-need-to-override-hashcode-and-equals-for-records");
-        Link link = new Link(1L, uri, time, time);
+        Link link = new Link(1L, uri, time, time, Type.STACKOVERFLOW, null, null, null, null);
         Optional<UpdateInfo> expectedUpdateInfo = Optional.empty();
         StackoverflowQuestion question = new StackoverflowQuestion(List.of(new StackoverflowQuestion.Item(
             "https://stackoverflow.com/questions/61719589/do-you-need-to-override-hashcode-and-equals-for-records",

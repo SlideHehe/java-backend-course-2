@@ -7,6 +7,11 @@ public record Link(
     Long id,
     URI url,
     OffsetDateTime updatedAt,
-    OffsetDateTime checkedAt
+    OffsetDateTime checkedAt,
+    Type type,
+    Integer answerCount,
+    Integer commentCount,
+    Integer pullRequestCount,
+    Integer commitCount
 ) {
 }

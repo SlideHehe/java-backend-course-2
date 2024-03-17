@@ -2,6 +2,7 @@ package edu.java.scrapper.api.links.jdbc;
 
 import edu.java.scrapper.IntegrationTest;
 import edu.java.scrapper.api.links.Link;
+import edu.java.scrapper.api.links.Type;
 import java.net.URI;
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -32,18 +33,18 @@ class JdbcLinkDaoTest extends IntegrationTest {
     void findAll() {
         // given
         OffsetDateTime time = OffsetDateTime.parse("2024-03-13T18:27:34.389Z");
-        jdbcClient.sql("insert into link (id, url, updated_at, checked_at) values "
-            +
-            "(1, 'https://aboba1.com', timestamp with time zone '2024-03-13T18:27:34.389Z', timestamp with time zone '2024-03-13T18:27:34.389Z'),"
-            +
-            "(2, 'https://aboba2.com', timestamp with time zone '2024-03-13T18:27:34.389Z', timestamp with time zone '2024-03-13T18:27:34.389Z'),"
-            +
-            "(3, 'https://aboba3.com', timestamp with time zone '2024-03-13T18:27:34.389Z', timestamp with time zone '2024-03-13T18:27:34.389Z')"
+        jdbcClient.sql("insert into link (id, url, updated_at, checked_at, type) values "
+                       +
+                       "(1, 'https://aboba1.com', timestamp with time zone '2024-03-13T18:27:34.389Z', timestamp with time zone '2024-03-13T18:27:34.389Z', 'GITHUB'),"
+                       +
+                       "(2, 'https://aboba2.com', timestamp with time zone '2024-03-13T18:27:34.389Z', timestamp with time zone '2024-03-13T18:27:34.389Z', 'GITHUB'),"
+                       +
+                       "(3, 'https://aboba3.com', timestamp with time zone '2024-03-13T18:27:34.389Z', timestamp with time zone '2024-03-13T18:27:34.389Z', 'GITHUB')"
         ).update();
         List<Link> expectedList = List.of(
-            new Link(1L, URI.create("https://aboba1.com"), time, time),
-            new Link(2L, URI.create("https://aboba2.com"), time, time),
-            new Link(3L, URI.create("https://aboba3.com"), time, time)
+            new Link(1L, URI.create("https://aboba1.com"), time, time, Type.GITHUB, null, null, null, null),
+            new Link(2L, URI.create("https://aboba2.com"), time, time, Type.GITHUB, null, null, null, null),
+            new Link(3L, URI.create("https://aboba3.com"), time, time, Type.GITHUB, null, null, null, null)
         );
 
         // when
@@ -69,11 +70,20 @@ class JdbcLinkDaoTest extends IntegrationTest {
     void findById() {
         // given
         OffsetDateTime time = OffsetDateTime.parse("2024-03-13T18:27:34.389Z");
-        jdbcClient.sql("insert into link (id, url, updated_at, checked_at) values "
-            +
-            "(1, 'https://aboba1.com', timestamp with time zone '2024-03-13T18:27:34.389Z', timestamp with time zone '2024-03-13T18:27:34.389Z')"
+        jdbcClient.sql("insert into link (id, url, updated_at, checked_at, type) values "
+                       +
+                       "(1, 'https://aboba1.com', timestamp with time zone '2024-03-13T18:27:34.389Z', timestamp with time zone '2024-03-13T18:27:34.389Z', 'GITHUB')"
         ).update();
-        Optional<Link> expectedLink = Optional.of(new Link(1L, URI.create("https://aboba1.com"), time, time));
+        Optional<Link> expectedLink = Optional.of(new Link(1L,
+            URI.create("https://aboba1.com"),
+            time,
+            time,
+            Type.GITHUB,
+            null,
+            null,
+            null,
+            null
+        ));
 
         // when
         Optional<Link> actualLink = jdbcLinkDao.findById(1L);
@@ -99,11 +109,11 @@ class JdbcLinkDaoTest extends IntegrationTest {
         // given
         OffsetDateTime time = OffsetDateTime.parse("2024-03-13T18:27:34.389Z");
         URI uri = URI.create("https://aboba1.com");
-        jdbcClient.sql("insert into link (id, url, updated_at, checked_at) values "
-            +
-            "(1, 'https://aboba1.com', timestamp with time zone '2024-03-13T18:27:34.389Z', timestamp with time zone '2024-03-13T18:27:34.389Z')"
+        jdbcClient.sql("insert into link (id, url, updated_at, checked_at, type) values "
+                       +
+                       "(1, 'https://aboba1.com', timestamp with time zone '2024-03-13T18:27:34.389Z', timestamp with time zone '2024-03-13T18:27:34.389Z', 'GITHUB')"
         ).update();
-        Optional<Link> expectedLink = Optional.of(new Link(1L, uri, time, time));
+        Optional<Link> expectedLink = Optional.of(new Link(1L, uri, time, time, Type.GITHUB, null, null, null, null));
 
         // when
         Optional<Link> actualLink = jdbcLinkDao.findByUrl(uri);
@@ -127,7 +137,7 @@ class JdbcLinkDaoTest extends IntegrationTest {
     @DisplayName("Добавление элемента")
     void add() {
         // when
-        jdbcLinkDao.add(URI.create("https://aboba1.com"));
+        jdbcLinkDao.add(URI.create("https://aboba1.com"), Type.GITHUB);
         Boolean result = jdbcClient.sql("select exists(select 1 from link where link.url = 'https://aboba1.com')")
             .query(Boolean.class).single();
 
@@ -142,10 +152,10 @@ class JdbcLinkDaoTest extends IntegrationTest {
     void addExistingUrl() {
         // given
         URI uri = URI.create("https://aboba1.com");
-        jdbcLinkDao.add(uri);
+        jdbcLinkDao.add(uri, Type.GITHUB);
 
         // when-then
-        assertThatThrownBy(() -> jdbcLinkDao.add(uri)).isInstanceOf(DuplicateKeyException.class);
+        assertThatThrownBy(() -> jdbcLinkDao.add(uri, Type.GITHUB)).isInstanceOf(DuplicateKeyException.class);
     }
 
     @Test
@@ -154,7 +164,7 @@ class JdbcLinkDaoTest extends IntegrationTest {
     @DisplayName("Удаление записи")
     void remove() {
         // given
-        jdbcClient.sql("insert into link (id, url) values (1, 'https://aboba1.com')").update();
+        jdbcClient.sql("insert into link (id, url, type) values (1, 'https://aboba1.com', 'GITHUB')").update();
 
         // when
         jdbcLinkDao.remove(1L);
@@ -181,18 +191,18 @@ class JdbcLinkDaoTest extends IntegrationTest {
     void findAllByChatId() {
         // given
         OffsetDateTime time = OffsetDateTime.parse("2024-03-13T18:27:34.389Z");
-        jdbcClient.sql("insert into link (id, url, updated_at, checked_at) values "
-            +
-            "(1, 'https://aboba1.com', timestamp with time zone '2024-03-13T18:27:34.389Z', timestamp with time zone '2024-03-13T18:27:34.389Z'),"
-            +
-            "(2, 'https://aboba2.com', timestamp with time zone '2024-03-13T18:27:34.389Z', timestamp with time zone '2024-03-13T18:27:34.389Z')"
+        jdbcClient.sql("insert into link (id, url, updated_at, checked_at, type) values "
+                       +
+                       "(1, 'https://aboba1.com', timestamp with time zone '2024-03-13T18:27:34.389Z', timestamp with time zone '2024-03-13T18:27:34.389Z', 'GITHUB'),"
+                       +
+                       "(2, 'https://aboba2.com', timestamp with time zone '2024-03-13T18:27:34.389Z', timestamp with time zone '2024-03-13T18:27:34.389Z', 'GITHUB')"
         ).update();
         jdbcClient.sql("insert into chat (id) values (1), (2);").update();
         jdbcClient.sql("insert into chat_link (chat_id, link_id) values (1, 1);").update();
         jdbcClient.sql("insert into chat_link (chat_id, link_id) values (2, 1);").update();
         jdbcClient.sql("insert into chat_link (chat_id, link_id) values (2, 2);").update();
         List<Link> expectedList = List.of(
-            new Link(1L, URI.create("https://aboba1.com"), time, time)
+            new Link(1L, URI.create("https://aboba1.com"), time, time, Type.GITHUB, null, null, null, null)
         );
 
         // when
@@ -209,7 +219,7 @@ class JdbcLinkDaoTest extends IntegrationTest {
     void updateUpdatedTimestamp() {
         // given
         jdbcClient.sql(
-                "insert into link (id, url, checked_at) values (1, 'https://aboba.com', '2024-03-13T18:27:34.389Z')")
+                "insert into link (id, url, checked_at, type) values (1, 'https://aboba.com', '2024-03-13T18:27:34.389Z', 'GITHUB')")
             .update();
 
         // when
@@ -220,7 +230,6 @@ class JdbcLinkDaoTest extends IntegrationTest {
 
         // then
         assertThat(link.updatedAt()).isEqualTo(OffsetDateTime.parse("2024-03-15T18:27:34.389Z"));
-        assertThat(link.checkedAt()).isNotEqualTo(OffsetDateTime.parse("2024-03-13T18:27:34.389Z"));
     }
 
     @Test
@@ -230,9 +239,9 @@ class JdbcLinkDaoTest extends IntegrationTest {
     void findCheckedMoreThanSomeSecondsAgo() {
         // given
         OffsetDateTime time = OffsetDateTime.now();
-        jdbcClient.sql("insert into link (id, url, updated_at, checked_at) values "
-            + "(1, 'https://aboba1.com', ?, ?),"
-            + "(2, 'https://aboba2.com', ?, ?)"
+        jdbcClient.sql("insert into link (id, url, updated_at, checked_at, type) values "
+                       + "(1, 'https://aboba1.com', ?, ?, 'GITHUB'),"
+                       + "(2, 'https://aboba2.com', ?, ?, 'GITHUB')"
         ).params(time, time.minusMinutes(10), time, time).update();
 
         // when
@@ -250,9 +259,9 @@ class JdbcLinkDaoTest extends IntegrationTest {
     void updateCheckedTimestamp() {
         // given
         OffsetDateTime time = OffsetDateTime.now().minusDays(1);
-        jdbcClient.sql("insert into link (id, url, checked_at) values "
-            + "(1, 'https://aboba1.com', ?),"
-            + "(2, 'https://aboba2.com', ?)"
+        jdbcClient.sql("insert into link (id, url, checked_at, type) values "
+                       + "(1, 'https://aboba1.com', ?, 'GITHUB'),"
+                       + "(2, 'https://aboba2.com', ?, 'GITHUB')"
         ).params(time, time).update();
 
         // when

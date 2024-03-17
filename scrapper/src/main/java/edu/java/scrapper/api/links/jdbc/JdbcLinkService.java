@@ -6,10 +6,12 @@ import edu.java.scrapper.api.exception.ResourceNotFoundException;
 import edu.java.scrapper.api.links.Link;
 import edu.java.scrapper.api.links.LinkMapper;
 import edu.java.scrapper.api.links.LinkService;
+import edu.java.scrapper.api.links.Type;
 import edu.java.scrapper.api.links.dto.AddLinkRequest;
 import edu.java.scrapper.api.links.dto.LinkResponse;
 import edu.java.scrapper.api.links.dto.ListLinkResponse;
 import edu.java.scrapper.api.links.dto.RemoveLinkRequest;
+import java.net.URI;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -37,8 +39,9 @@ public class JdbcLinkService implements LinkService {
     @Override
     @Transactional
     public LinkResponse addLink(Long tgChatId, AddLinkRequest addLinkRequest) {
+        Type type = getHostType(addLinkRequest.link());
         Link link = jdbcLinkDao.findByUrl(addLinkRequest.link())
-            .orElseGet(() -> jdbcLinkDao.add(addLinkRequest.link()));
+            .orElseGet(() -> jdbcLinkDao.add(addLinkRequest.link(), type));
 
         jdbcChatLinkDao.findById(tgChatId, link.id()).ifPresent(ignored -> {
             throw new LinkAlreadyExistsException("Переданная ссылка уже отслеживается");
@@ -51,6 +54,12 @@ public class JdbcLinkService implements LinkService {
         }
 
         return LinkMapper.linkToLinkResponse(link);
+    }
+
+    private Type getHostType(URI uri) {
+        int domainZoneIndex = uri.getHost().lastIndexOf('.');
+        String host = uri.getHost().substring(0, domainZoneIndex).toUpperCase();
+        return Type.valueOf(host);
     }
 
     @Override
