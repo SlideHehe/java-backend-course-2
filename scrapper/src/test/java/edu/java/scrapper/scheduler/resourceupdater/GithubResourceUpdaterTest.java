@@ -29,7 +29,16 @@ class GithubResourceUpdaterTest {
     void supportsTrue() {
         // given
         OffsetDateTime time = OffsetDateTime.now();
-        Link link = new Link(1L, URI.create("https://github.com/SlideHehe/java-backend-course-2"), time, time, Type.GITHUB, null, null, null, null);
+        Link link = new Link(1L,
+            URI.create("https://github.com/SlideHehe/java-backend-course-2"),
+            time,
+            time,
+            Type.GITHUB,
+            null,
+            null,
+            null,
+            null
+        );
 
         // when-then
         assertThat(githubResourceUpdater.supports(link)).isTrue();
@@ -40,7 +49,16 @@ class GithubResourceUpdaterTest {
     void supportsFalse() {
         // given
         OffsetDateTime time = OffsetDateTime.now();
-        Link link = new Link(1L, URI.create("https://github.com/java-backend-course-2"), time, time, Type.GITHUB, null, null, null, null);
+        Link link = new Link(1L,
+            URI.create("https://github.com/java-backend-course-2"),
+            time,
+            time,
+            Type.GITHUB,
+            null,
+            null,
+            null,
+            null
+        );
 
         // when-then
         assertThat(githubResourceUpdater.supports(link)).isFalse();
@@ -53,7 +71,8 @@ class GithubResourceUpdaterTest {
         OffsetDateTime time = OffsetDateTime.now();
         URI uri = URI.create("https://github.com/SlideHehe/java-backend-course-2");
         Link link = new Link(1L, uri, time.minusMinutes(10), time, Type.GITHUB, null, null, null, null);
-        GithubRepository repository = new GithubRepository("https://github.com/SlideHehe/java-backend-course-2", time);
+        GithubRepository repository =
+            new GithubRepository("java-backend-course-2", "https://github.com/SlideHehe/java-backend-course-2", time);
         when(githubClient.getRepository("SlideHehe", "java-backend-course-2")).thenReturn(repository);
         Optional<UpdateInfo> expectedUpdateInfo =
             Optional.of(new UpdateInfo(1L, uri, ResourceUpdaterConstants.GITHUB_UPDATE_RESPONSE, time));
@@ -72,7 +91,8 @@ class GithubResourceUpdaterTest {
         OffsetDateTime time = OffsetDateTime.now();
         URI uri = URI.create("https://github.com/SlideHehe/java-backend-course-2");
         Link link = new Link(1L, uri, time, time, Type.GITHUB, null, null, null, null);
-        GithubRepository repository = new GithubRepository("https://github.com/SlideHehe/java-backend-course-2", time);
+        GithubRepository repository =
+            new GithubRepository("java-backend-course-2", "https://github.com/SlideHehe/java-backend-course-2", time);
         when(githubClient.getRepository("SlideHehe", "java-backend-course-2")).thenReturn(repository);
         Optional<UpdateInfo> expectedUpdateInfo = Optional.empty();
 
