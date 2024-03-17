@@ -6,15 +6,18 @@ import java.time.OffsetDateTime;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public record StackoverflowQuestion(
+public record StackoverflowComments(
     List<Item> items
 ) {
     public record Item(
-        String title,
-        String link,
-
-        @JsonAlias("last_activity_date")
-        OffsetDateTime lastActivityDate
+        Owner owner,
+        @JsonAlias("creation_date")
+        OffsetDateTime creationDate
     ) {
+        public record Owner(
+            @JsonAlias("display_name")
+            String name
+        ) {
+        }
     }
 }

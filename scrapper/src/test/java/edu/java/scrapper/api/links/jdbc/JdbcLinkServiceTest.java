@@ -190,7 +190,6 @@ class JdbcLinkServiceTest {
         // given
         URI uri = URI.create("https://github.com");
         when(jdbcLinkDao.findByUrl(uri)).thenReturn(Optional.empty());
-        ;
         // when-then
         assertThatThrownBy(() -> linkService.removeLink(1L, new RemoveLinkRequest(uri)))
             .isInstanceOf(ResourceNotFoundException.class)

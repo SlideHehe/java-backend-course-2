@@ -77,6 +77,7 @@ class StackoverflowResourceUpdaterTest {
             "https://stackoverflow.com/questions/61719589/do-you-need-to-override-hashcode-and-equals-for-records");
         Link link = new Link(1L, uri, time.minusMinutes(10), time, Type.STACKOVERFLOW, null, null, null, null);
         StackoverflowQuestion question = new StackoverflowQuestion(List.of(new StackoverflowQuestion.Item(
+            "aboba",
             "https://stackoverflow.com/questions/61719589/do-you-need-to-override-hashcode-and-equals-for-records",
             time
         )));
@@ -101,6 +102,7 @@ class StackoverflowResourceUpdaterTest {
         Link link = new Link(1L, uri, time, time, Type.STACKOVERFLOW, null, null, null, null);
         Optional<UpdateInfo> expectedUpdateInfo = Optional.empty();
         StackoverflowQuestion question = new StackoverflowQuestion(List.of(new StackoverflowQuestion.Item(
+            "aboba",
             "https://stackoverflow.com/questions/61719589/do-you-need-to-override-hashcode-and-equals-for-records",
             time
         )));
