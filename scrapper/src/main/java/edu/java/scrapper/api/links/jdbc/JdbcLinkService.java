@@ -11,7 +11,6 @@ import edu.java.scrapper.api.links.dto.AddLinkRequest;
 import edu.java.scrapper.api.links.dto.LinkResponse;
 import edu.java.scrapper.api.links.dto.ListLinkResponse;
 import edu.java.scrapper.api.links.dto.RemoveLinkRequest;
-import java.net.URI;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -54,12 +53,6 @@ public class JdbcLinkService implements LinkService {
         }
 
         return LinkMapper.linkToLinkResponse(link);
-    }
-
-    private Type getHostType(URI uri) {
-        int domainZoneIndex = uri.getHost().lastIndexOf('.');
-        String host = uri.getHost().substring(0, domainZoneIndex).toUpperCase();
-        return Type.valueOf(host);
     }
 
     @Override

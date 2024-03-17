@@ -48,18 +48,26 @@ public class JdbcLinkUpdater implements LinkUpdater {
     }
 
     private void processLink(UpdateInfo updateInfo) {
-        jdbcLinkDao.updateUpdatedTimestamp(updateInfo.linkId(), updateInfo.updatedAt());
+        Link link = updateInfo.link();
+        jdbcLinkDao.updateUpdatedTimestamp(link.id(), link.updatedAt());
+        jdbcLinkDao.updateCounters(
+            link.id(),
+            link.answerCount(),
+            link.commentCount(),
+            link.pullRequestCount(),
+            link.commitCount()
+        );
         sendUpdate(updateInfo);
     }
 
     private void sendUpdate(UpdateInfo updateInfo) {
-        List<Long> chatIds = jdbcTgChatDao.findAllByLinkId(updateInfo.linkId())
+        List<Long> chatIds = jdbcTgChatDao.findAllByLinkId(updateInfo.link().id())
             .stream()
             .map(TgChat::id)
             .toList();
 
         LinkUpdateRequest linkUpdateRequest =
-            new LinkUpdateRequest(updateInfo.url(), updateInfo.description(), chatIds);
+            new LinkUpdateRequest(updateInfo.link().url(), updateInfo.description(), chatIds);
 
         try {
             botClient.createUpdate(linkUpdateRequest);

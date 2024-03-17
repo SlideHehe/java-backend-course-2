@@ -1,12 +1,9 @@
 package edu.java.scrapper.scheduler;
 
-import java.net.URI;
-import java.time.OffsetDateTime;
+import edu.java.scrapper.api.links.Link;
 
 public record UpdateInfo(
-    Long linkId,
-    URI url,
-    String description,
-    OffsetDateTime updatedAt
+    Link link,
+    String description
 ) {
 }

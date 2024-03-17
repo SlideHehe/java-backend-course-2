@@ -74,7 +74,8 @@ class JdbcLinkDaoTest extends IntegrationTest {
                        +
                        "(1, 'https://aboba1.com', timestamp with time zone '2024-03-13T18:27:34.389Z', timestamp with time zone '2024-03-13T18:27:34.389Z', 'GITHUB')"
         ).update();
-        Optional<Link> expectedLink = Optional.of(new Link(1L,
+        Optional<Link> expectedLink = Optional.of(new Link(
+            1L,
             URI.create("https://aboba1.com"),
             time,
             time,
@@ -272,5 +273,24 @@ class JdbcLinkDaoTest extends IntegrationTest {
         assertThat(actualList.getFirst().updatedAt()).isNotEqualTo(time);
         assertThat(actualList.get(1).url()).isEqualTo(URI.create("https://aboba2.com"));
         assertThat(actualList.get(1).updatedAt()).isNotEqualTo(time);
+    }
+
+    @Test
+    @Transactional
+    @Rollback
+    @DisplayName("Проверка обновления счетчиков")
+    void updateCounters() {
+        // given
+        jdbcClient.sql("insert into link (id, url, type) "
+                       + "values (1, 'https://aboba1.com', 'GITHUB');").update();
+
+        // when
+        Link link = jdbcLinkDao.updateCounters(1L, 1, 1, 1, 1);
+
+        // then
+        assertThat(link.answerCount()).isEqualTo(1);
+        assertThat(link.commentCount()).isEqualTo(1);
+        assertThat(link.pullRequestCount()).isEqualTo(1);
+        assertThat(link.commitCount()).isEqualTo(1);
     }
 }

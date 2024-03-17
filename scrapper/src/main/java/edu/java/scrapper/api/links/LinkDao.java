@@ -20,9 +20,13 @@ public interface LinkDao {
 
     List<Link> updateCheckedTimestamp(List<Long> ids);
 
-    Link updateStackoverflowLink(Long id, Integer answerCount, Integer commentCount);
-
-    Link updateGithubLink(Long id, Integer pullRequestCount, Integer commitCount);
+    Link updateCounters(
+        Long id,
+        Integer answerCount,
+        Integer commentCount,
+        Integer pullRequestCount,
+        Integer commitCount
+    );
 
     Link remove(Long id);
 
