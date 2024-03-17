@@ -1,9 +1,9 @@
 package edu.java.scrapper.scheduler.jdbc;
 
-import edu.java.scrapper.api.links.Link;
-import edu.java.scrapper.api.links.Type;
-import edu.java.scrapper.api.links.jdbc.JdbcLinkDao;
-import edu.java.scrapper.api.tgchat.jdbc.JdbcTgChatDao;
+import edu.java.scrapper.domain.links.Link;
+import edu.java.scrapper.domain.links.Type;
+import edu.java.scrapper.domain.links.jdbc.JdbcLinkDao;
+import edu.java.scrapper.domain.tgchat.jdbc.JdbcTgChatDao;
 import edu.java.scrapper.client.bot.BotClient;
 import edu.java.scrapper.configuration.ApplicationConfig;
 import edu.java.scrapper.scheduler.resourceupdater.GithubResourceUpdater;

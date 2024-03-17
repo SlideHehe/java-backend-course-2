@@ -1,6 +1,6 @@
 package edu.java.scrapper.scheduler.resourceupdater;
 
-import edu.java.scrapper.api.links.Link;
+import edu.java.scrapper.domain.links.Link;
 import edu.java.scrapper.scheduler.UpdateInfo;
 import java.util.Optional;
 

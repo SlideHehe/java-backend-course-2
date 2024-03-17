@@ -13,6 +13,6 @@ public class LinkUpdaterScheduler {
 
     @Scheduled(fixedDelayString = "#{@scheduler.interval}")
     public void update() {
-        jdbcLinkUpdater.update();
+//        jdbcLinkUpdater.update();
     }
 }
