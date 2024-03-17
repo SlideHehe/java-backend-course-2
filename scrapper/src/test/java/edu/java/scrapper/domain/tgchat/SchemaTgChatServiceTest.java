@@ -1,9 +1,8 @@
-package edu.java.scrapper.domain.tgchat.jdbc;
+package edu.java.scrapper.domain.tgchat;
 
-import edu.java.scrapper.domain.chatlink.jdbc.JdbcChatLinkDao;
+import edu.java.scrapper.domain.chatlink.ChatLinkDao;
 import edu.java.scrapper.domain.exception.ChatAlreadyExistsException;
 import edu.java.scrapper.domain.exception.ResourceNotFoundException;
-import edu.java.scrapper.domain.tgchat.TgChat;
 import java.time.OffsetDateTime;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -17,21 +16,21 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class JdbcTgChatServiceTest {
+class SchemaTgChatServiceTest {
     @Mock
-    JdbcTgChatDao jdbcTgChatDao;
+    TgChatDao tgChatDao;
 
     @Mock
-    JdbcChatLinkDao jdbcChatLinkDao;
+    ChatLinkDao chatLinkDao;
 
     @InjectMocks
-    JdbcTgChatService chatService;
+    SchemaTgChatService chatService;
 
     @Test
     @DisplayName("Регистрация чата")
     void registerChat() {
         // given
-        when(jdbcTgChatDao.findById(1L)).thenReturn(Optional.empty());
+        when(tgChatDao.findById(1L)).thenReturn(Optional.empty());
 
         // when-then
         assertThatNoException().isThrownBy(() -> chatService.registerChat(1L));
@@ -41,7 +40,7 @@ class JdbcTgChatServiceTest {
     @DisplayName("Регистрация уже зарегистрированного чата")
     void registerRegisteredChat() {
         // given
-        when(jdbcTgChatDao.findById(1L)).thenReturn(Optional.of(new TgChat(1L, OffsetDateTime.now())));
+        when(tgChatDao.findById(1L)).thenReturn(Optional.of(new TgChat(1L, OffsetDateTime.now())));
 
         // when-then
         assertThatThrownBy(() -> chatService.registerChat(1L))
@@ -53,7 +52,7 @@ class JdbcTgChatServiceTest {
     @DisplayName("Удаление чата")
     void deleteChat() {
         // given
-        when(jdbcTgChatDao.findById(1L)).thenReturn(Optional.of(new TgChat(1L, OffsetDateTime.now())));
+        when(tgChatDao.findById(1L)).thenReturn(Optional.of(new TgChat(1L, OffsetDateTime.now())));
         chatService.deleteChat(1L);
 
         // when-then
@@ -64,7 +63,7 @@ class JdbcTgChatServiceTest {
     @DisplayName("Удаление незарегистрированного чата")
     void deleteNonRegisteredChat() {
         // given
-        when(jdbcTgChatDao.findById(1L)).thenReturn(Optional.empty());
+        when(tgChatDao.findById(1L)).thenReturn(Optional.empty());
 
         // when-then
         assertThatThrownBy(() -> chatService.deleteChat(1L))

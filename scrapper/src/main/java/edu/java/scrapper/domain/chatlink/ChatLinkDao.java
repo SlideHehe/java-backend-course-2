@@ -11,4 +11,6 @@ public interface ChatLinkDao {
     ChatLink add(Long chatId, Long linkId);
 
     ChatLink remove(Long chatId, Long linkId);
+
+    void removeDanglingLinks();
 }

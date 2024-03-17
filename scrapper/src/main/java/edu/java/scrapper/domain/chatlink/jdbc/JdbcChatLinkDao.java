@@ -48,6 +48,7 @@ public class JdbcChatLinkDao implements ChatLinkDao {
             .single();
     }
 
+    @Override
     public void removeDanglingLinks() {
         jdbcClient.sql("delete from link where not exists(select 1 from chat_link where chat_link.link_id = link.id)")
             .update();

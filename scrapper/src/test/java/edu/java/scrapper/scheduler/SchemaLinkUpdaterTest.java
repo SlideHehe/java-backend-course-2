@@ -1,11 +1,11 @@
-package edu.java.scrapper.scheduler.jdbc;
+package edu.java.scrapper.scheduler;
 
-import edu.java.scrapper.domain.links.Link;
-import edu.java.scrapper.domain.links.Type;
-import edu.java.scrapper.domain.links.jdbc.JdbcLinkDao;
-import edu.java.scrapper.domain.tgchat.jdbc.JdbcTgChatDao;
 import edu.java.scrapper.client.bot.BotClient;
 import edu.java.scrapper.configuration.ApplicationConfig;
+import edu.java.scrapper.domain.links.Link;
+import edu.java.scrapper.domain.links.LinkDao;
+import edu.java.scrapper.domain.links.Type;
+import edu.java.scrapper.domain.tgchat.TgChatDao;
 import edu.java.scrapper.scheduler.resourceupdater.GithubResourceUpdater;
 import java.net.URI;
 import java.time.Duration;
@@ -22,11 +22,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class JdbcLinkUpdaterTest {
+class SchemaLinkUpdaterTest {
     @Mock
-    JdbcTgChatDao jdbcTgChatDao;
+    TgChatDao tgChatDao;
     @Mock
-    JdbcLinkDao jdbcLinkDao;
+    LinkDao linkDao;
     @Mock
     BotClient botClient;
     @Mock
@@ -47,7 +47,7 @@ class JdbcLinkUpdaterTest {
         );
         Duration duration = Duration.ofSeconds(10L);
         when(applicationConfig.scheduler()).thenReturn(new ApplicationConfig.Scheduler(false, duration, duration));
-        when(jdbcLinkDao.findCheckedMoreThanSomeSecondsAgo(10L)).thenReturn(links);
+        when(linkDao.findCheckedMoreThanSomeSecondsAgo(10L)).thenReturn(links);
         when(githubResourceUpdater.supports(new Link(
             1L,
             uri,
@@ -59,9 +59,9 @@ class JdbcLinkUpdaterTest {
             null,
             null
         ))).thenReturn(true);
-        JdbcLinkUpdater linkUpdater = new JdbcLinkUpdater(
-            jdbcTgChatDao,
-            jdbcLinkDao,
+        SchemaLinkUpdater linkUpdater = new SchemaLinkUpdater(
+            tgChatDao,
+            linkDao,
             botClient,
             applicationConfig,
             List.of(githubResourceUpdater)

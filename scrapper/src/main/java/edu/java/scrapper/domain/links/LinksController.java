@@ -4,6 +4,7 @@ import edu.java.scrapper.domain.links.dto.AddLinkRequest;
 import edu.java.scrapper.domain.links.dto.LinkResponse;
 import edu.java.scrapper.domain.links.dto.ListLinkResponse;
 import edu.java.scrapper.domain.links.dto.RemoveLinkRequest;
+import edu.java.scrapper.domain.links.jdbc.JdbcLinkService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/links")
 public class LinksController {
-    private final LinkService linksService;
+    private final JdbcLinkService linksService;
 
     @GetMapping
     public ListLinkResponse getFollowedLinks(@RequestHeader("Tg-Chat-Id") @Min(1L) Long tgChatId) {

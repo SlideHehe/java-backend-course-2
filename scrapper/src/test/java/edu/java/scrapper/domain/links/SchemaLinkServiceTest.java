@@ -1,15 +1,14 @@
-package edu.java.scrapper.domain.links.jdbc;
+package edu.java.scrapper.domain.links;
 
 import edu.java.scrapper.domain.chatlink.ChatLink;
 import edu.java.scrapper.domain.chatlink.jdbc.JdbcChatLinkDao;
 import edu.java.scrapper.domain.exception.LinkAlreadyExistsException;
 import edu.java.scrapper.domain.exception.ResourceNotFoundException;
-import edu.java.scrapper.domain.links.Link;
-import edu.java.scrapper.domain.links.Type;
 import edu.java.scrapper.domain.links.dto.AddLinkRequest;
 import edu.java.scrapper.domain.links.dto.LinkResponse;
 import edu.java.scrapper.domain.links.dto.ListLinkResponse;
 import edu.java.scrapper.domain.links.dto.RemoveLinkRequest;
+import edu.java.scrapper.domain.links.jdbc.JdbcLinkDao;
 import java.net.URI;
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -26,7 +25,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class JdbcLinkServiceTest {
+class SchemaLinkServiceTest {
     @Mock
     JdbcLinkDao jdbcLinkDao;
 
@@ -34,7 +33,7 @@ class JdbcLinkServiceTest {
     JdbcChatLinkDao jdbcChatLinkDao;
 
     @InjectMocks
-    JdbcLinkService linkService;
+    SchemaLinkService linkService;
 
     @Test
     @DisplayName("Получение отслеживаемых ссылок")

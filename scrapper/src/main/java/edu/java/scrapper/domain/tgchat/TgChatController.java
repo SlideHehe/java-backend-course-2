@@ -1,5 +1,6 @@
 package edu.java.scrapper.domain.tgchat;
 
+import edu.java.scrapper.domain.tgchat.jdbc.JdbcTgChatService;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -12,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/tg-chat")
 public class TgChatController {
-    private final TgChatService tgChatService;
+    private final JdbcTgChatService tgChatService;
 
     @PostMapping("/{id}")
     public void registerChat(@PathVariable @Min(1) Long id) {

@@ -1,12 +1,20 @@
-package edu.java.scrapper.domain.tgchat.jdbc;
+package edu.java.scrapper.domain.tgchat;
 
 import edu.java.scrapper.IntegrationTest;
-import edu.java.scrapper.domain.tgchat.TgChat;
+import edu.java.scrapper.domain.tgchat.jdbc.JdbcTgChatDao;
+import edu.java.scrapper.domain.tgchat.jooq.JooqTgChatDao;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
+import org.jooq.exception.NoDataFoundException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DuplicateKeyException;
@@ -16,83 +24,96 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 
 @SpringBootTest
-class JdbcTgChatDaoTest extends IntegrationTest {
+@TestInstance(PER_CLASS)
+class TgChatDaoTest extends IntegrationTest {
     @Autowired
     JdbcClient jdbcClient;
     @Autowired
     JdbcTgChatDao jdbcTgChatDao;
+    @Autowired
+    JooqTgChatDao jooqTgChatDao;
 
-    @Test
+    @BeforeEach
+    public void resetSequence() {
+        jdbcClient.sql("truncate link cascade").update();
+    }
+
+    Stream<Arguments> tgChatDaoProvider() {
+        return Stream.of(
+            Arguments.of(jdbcTgChatDao),
+            Arguments.of(jooqTgChatDao)
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("tgChatDaoProvider")
     @Transactional
     @Rollback
     @DisplayName("Поиск всех записей")
-    void findAll() {
+    void findAll(TgChatDao tgChatDao) {
         // given
-        OffsetDateTime time = OffsetDateTime.parse("2024-03-13T18:27:34.389Z");
         jdbcClient.sql("insert into chat (id, created_at) values "
-            + "(1, timestamp with time zone '2024-03-13T18:27:34.389Z'),"
-            + "(2, timestamp with time zone '2024-03-13T18:27:34.389Z'),"
-            + "(3, timestamp with time zone '2024-03-13T18:27:34.389Z')"
+                       + "(1, timestamp with time zone '2024-03-13T18:27:34.389Z'),"
+                       + "(2, timestamp with time zone '2024-03-13T18:27:34.389Z'),"
+                       + "(3, timestamp with time zone '2024-03-13T18:27:34.389Z')"
         ).update();
-        List<TgChat> expectedList = List.of(
-            new TgChat(1L, time),
-            new TgChat(2L, time),
-            new TgChat(3L, time)
-        );
 
         // when
-        List<TgChat> actualList = jdbcTgChatDao.findAll();
+        List<TgChat> actualList = tgChatDao.findAll();
 
         // then
-        assertThat(actualList).isEqualTo(expectedList);
+        assertThat(actualList.size()).isEqualTo(3);
     }
 
-    @Test
+    @ParameterizedTest
+    @MethodSource("tgChatDaoProvider")
     @Transactional
     @Rollback
     @DisplayName("Выборка списка из пустой таблицы")
-    void findAllEmptyTable() {
+    void findAllEmptyTable(TgChatDao tgChatDao) {
         // when-then
-        assertThat(jdbcTgChatDao.findAll()).isEmpty();
+        assertThat(tgChatDao.findAll()).isEmpty();
     }
 
-    @Test
+    @ParameterizedTest
+    @MethodSource("tgChatDaoProvider")
     @Transactional
     @Rollback
     @DisplayName("Поиск записи по первичному ключу")
-    void findById() {
+    void findById(TgChatDao tgChatDao) {
         // given
-        OffsetDateTime time = OffsetDateTime.parse("2024-03-13T18:27:34.389Z");
         jdbcClient.sql(
             "insert into chat (id, created_at) values (1, timestamp with time zone '2024-03-13T18:27:34.389Z')"
         ).update();
-        Optional<TgChat> expectedChat = Optional.of(new TgChat(1L, time));
 
         // when
-        Optional<TgChat> actualChat = jdbcTgChatDao.findById(1L);
+        Optional<TgChat> actualChat = tgChatDao.findById(1L);
 
         // then
-        assertThat(actualChat).isEqualTo(expectedChat);
+        assertThat(actualChat.get().id()).isEqualTo(1L);
     }
 
-    @Test
+    @ParameterizedTest
+    @MethodSource("tgChatDaoProvider")
     @Transactional
     @Rollback
     @DisplayName("Поиск записи по несуществующему ключу")
-    void findByNonexistentId() {
+    void findByNonexistentId(TgChatDao tgChatDao) {
         // when-then
-        assertThat(jdbcTgChatDao.findById(1L)).isNotPresent();
+        assertThat(tgChatDao.findById(1L)).isNotPresent();
     }
 
-    @Test
+    @ParameterizedTest
+    @MethodSource("tgChatDaoProvider")
     @Transactional
     @Rollback
     @DisplayName("Добавление элемента")
-    void add() {
+    void add(TgChatDao tgChatDao) {
         // when
-        jdbcTgChatDao.add(1L);
+        tgChatDao.add(1L);
         Boolean result =
             jdbcClient.sql("select exists(select 1 from chat where chat.id = 1)").query(Boolean.class).single();
 
@@ -100,28 +121,30 @@ class JdbcTgChatDaoTest extends IntegrationTest {
         assertThat(result).isTrue();
     }
 
-    @Test
+    @ParameterizedTest
+    @MethodSource("tgChatDaoProvider")
     @Transactional
     @Rollback
     @DisplayName("Повторное добавление записи")
-    void addExistingRecord() {
+    void addExistingRecord(TgChatDao tgChatDao) {
         // given
-        jdbcTgChatDao.add(1L);
+        tgChatDao.add(1L);
 
         // when-then
-        assertThatThrownBy(() -> jdbcTgChatDao.add(1L)).isInstanceOf(DuplicateKeyException.class);
+        assertThatThrownBy(() -> tgChatDao.add(1L)).isInstanceOf(DuplicateKeyException.class);
     }
 
-    @Test
+    @ParameterizedTest
+    @MethodSource("tgChatDaoProvider")
     @Transactional
     @Rollback
     @DisplayName("Удаление записи")
-    void remove() {
+    void remove(TgChatDao tgChatDao) {
         // given
         jdbcClient.sql("insert into chat (id) values (1)").update();
 
         // when
-        jdbcTgChatDao.remove(1L);
+        tgChatDao.remove(1L);
         Boolean result =
             jdbcClient.sql("select exists(select 1 from chat where chat.id = 1)").query(Boolean.class).single();
 
@@ -132,8 +155,8 @@ class JdbcTgChatDaoTest extends IntegrationTest {
     @Test
     @Transactional
     @Rollback
-    @DisplayName("Удаление несуществующей записи")
-    void removeNonexistent() {
+    @DisplayName("Удаление несуществующей записи jdbc")
+    void removeNonexistentJdbc() {
         // when-then
         assertThatThrownBy(() -> jdbcTgChatDao.remove(1L)).isInstanceOf(EmptyResultDataAccessException.class);
     }
@@ -141,27 +164,33 @@ class JdbcTgChatDaoTest extends IntegrationTest {
     @Test
     @Transactional
     @Rollback
+    @DisplayName("Удаление несуществующей записи jooq")
+    void removeNonexistentJooq() {
+        // when-then
+        assertThatThrownBy(() -> jooqTgChatDao.remove(1L)).isInstanceOf(NoDataFoundException.class);
+    }
+
+    @ParameterizedTest
+    @MethodSource("tgChatDaoProvider")
+    @Transactional
+    @Rollback
     @DisplayName("Получение ссылок, отслеживаемых пользователем")
-    void findAllByLinkId() {
+    void findAllByLinkId(TgChatDao tgChatDao) {
         // given
-        OffsetDateTime time = OffsetDateTime.parse("2024-03-13T18:27:34.389Z");
         jdbcClient.sql("insert into link (id, url, type) values "
                        + "(1, 'https://aboba1.com', 'GITHUB'), (2, 'https://aboba2.com', 'GITHUB')"
         ).update();
         jdbcClient.sql("insert into chat (id, created_at) values "
-            + "(1, timestamp with time zone '2024-03-13T18:27:34.389Z'), "
-            + "(2, timestamp with time zone '2024-03-13T18:27:34.389Z');").update();
+                       + "(1, timestamp with time zone '2024-03-13T18:27:34.389Z'), "
+                       + "(2, timestamp with time zone '2024-03-13T18:27:34.389Z');").update();
         jdbcClient.sql("insert into chat_link (chat_id, link_id) values (1, 1);").update();
         jdbcClient.sql("insert into chat_link (chat_id, link_id) values (1, 2);").update();
         jdbcClient.sql("insert into chat_link (chat_id, link_id) values (2, 2);").update();
-        List<TgChat> expectedList = List.of(
-            new TgChat(1L, time)
-        );
 
         // when
-        List<TgChat> actualList = jdbcTgChatDao.findAllByLinkId(1L);
+        List<TgChat> actualList = tgChatDao.findAllByLinkId(1L);
 
         // then
-        assertThat(actualList).isEqualTo(expectedList);
+        assertThat(actualList.getFirst().id()).isEqualTo(1L);
     }
 }

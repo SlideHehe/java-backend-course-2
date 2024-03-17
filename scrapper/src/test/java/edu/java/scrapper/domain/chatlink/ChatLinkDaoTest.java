@@ -1,11 +1,19 @@
-package edu.java.scrapper.domain.chatlink.jdbc;
+package edu.java.scrapper.domain.chatlink;
 
 import edu.java.scrapper.IntegrationTest;
-import edu.java.scrapper.domain.chatlink.ChatLink;
+import edu.java.scrapper.domain.chatlink.jdbc.JdbcChatLinkDao;
+import edu.java.scrapper.domain.chatlink.jooq.JooqChatLinkDao;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
+import org.jooq.exception.NoDataFoundException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DuplicateKeyException;
@@ -15,19 +23,36 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 
 @SpringBootTest
-class JdbcChatLinkDaoTest extends IntegrationTest {
+@TestInstance(PER_CLASS)
+class ChatLinkDaoTest extends IntegrationTest {
     @Autowired
     JdbcClient jdbcClient;
     @Autowired
+    JooqChatLinkDao jooqChatLinkDao;
+    @Autowired
     JdbcChatLinkDao jdbcChatLinkDao;
 
-    @Test
+    Stream<Arguments> chatLinkDaoProvider() {
+        return Stream.of(
+            Arguments.of(jooqChatLinkDao),
+            Arguments.of(jdbcChatLinkDao)
+        );
+    }
+
+    @BeforeEach
+    public void resetSequence() {
+        jdbcClient.sql("truncate link cascade").update();
+    }
+
+    @ParameterizedTest
+    @MethodSource("chatLinkDaoProvider")
     @Transactional
     @Rollback
     @DisplayName("Поиск всех записей")
-    void findAll() {
+    void findAll(ChatLinkDao chatLinkDao) {
         // given
         jdbcClient.sql("insert into link (id, url, type) values "
                        + "(1, 'https://aboba1.com', 'GITHUB'),"
@@ -43,26 +68,28 @@ class JdbcChatLinkDaoTest extends IntegrationTest {
         );
 
         // when
-        List<ChatLink> actualList = jdbcChatLinkDao.findAll();
+        List<ChatLink> actualList = chatLinkDao.findAll();
 
         // then
         assertThat(actualList).isEqualTo(expectedList);
     }
 
-    @Test
+    @ParameterizedTest
+    @MethodSource("chatLinkDaoProvider")
     @Transactional
     @Rollback
     @DisplayName("Выборка списка из пустой таблицы")
-    void findAllEmptyTable() {
+    void findAllEmptyTable(ChatLinkDao chatLinkDao) {
         // when-then
-        assertThat(jdbcChatLinkDao.findAll()).isEmpty();
+        assertThat(chatLinkDao.findAll()).isEmpty();
     }
 
-    @Test
+    @ParameterizedTest
+    @MethodSource("chatLinkDaoProvider")
     @Transactional
     @Rollback
     @DisplayName("Поиск записи по первичному ключу")
-    void findById() {
+    void findById(ChatLinkDao chatLinkDao) {
         // given
         jdbcClient.sql("insert into link (id, url, type) values "
                        + "(1, 'https://aboba1.com', 'GITHUB'),"
@@ -73,32 +100,34 @@ class JdbcChatLinkDaoTest extends IntegrationTest {
         Optional<ChatLink> expectedChatLink = Optional.of(new ChatLink(1L, 1L));
 
         // when
-        Optional<ChatLink> actualChatLink = jdbcChatLinkDao.findById(1L, 1L);
+        Optional<ChatLink> actualChatLink = chatLinkDao.findById(1L, 1L);
 
         // then
         assertThat(actualChatLink).isEqualTo(expectedChatLink);
     }
 
-    @Test
+    @ParameterizedTest
+    @MethodSource("chatLinkDaoProvider")
     @Transactional
     @Rollback
     @DisplayName("Поиск записи по несуществующему ключу")
-    void findByNonexistentId() {
+    void findByNonexistentId(ChatLinkDao chatLinkDao) {
         // when-then
-        assertThat(jdbcChatLinkDao.findById(1L, 1L)).isNotPresent();
+        assertThat(chatLinkDao.findById(1L, 1L)).isNotPresent();
     }
 
-    @Test
+    @ParameterizedTest
+    @MethodSource("chatLinkDaoProvider")
     @Transactional
     @Rollback
     @DisplayName("Добавление элемента")
-    void add() {
+    void add(ChatLinkDao chatLinkDao) {
         // given
         jdbcClient.sql("insert into link (id, url, type) values (1, 'https://aboba1.com', 'GITHUB')").update();
         jdbcClient.sql("insert into chat (id) values (1);").update();
 
         // when
-        jdbcChatLinkDao.add(1L, 1L);
+        chatLinkDao.add(1L, 1L);
         Boolean result = jdbcClient.sql("select exists(select 1 from chat_link where link_id = 1 and chat_id = 1)")
             .query(Boolean.class).single();
 
@@ -106,32 +135,34 @@ class JdbcChatLinkDaoTest extends IntegrationTest {
         assertThat(result).isTrue();
     }
 
-    @Test
+    @ParameterizedTest
+    @MethodSource("chatLinkDaoProvider")
     @Transactional
     @Rollback
     @DisplayName("Повторное добавление записи")
-    void addExistingRecord() {
+    void addExistingRecord(ChatLinkDao chatLinkDao) {
         // given
         jdbcClient.sql("insert into link (id, url, type) values (1, 'https://aboba1.com', 'GITHUB')").update();
         jdbcClient.sql("insert into chat (id) values (1);").update();
-        jdbcChatLinkDao.add(1L, 1L);
+        chatLinkDao.add(1L, 1L);
 
         // when
-        assertThatThrownBy(() -> jdbcChatLinkDao.add(1L, 1L)).isInstanceOf(DuplicateKeyException.class);
+        assertThatThrownBy(() -> chatLinkDao.add(1L, 1L)).isInstanceOf(DuplicateKeyException.class);
     }
 
-    @Test
+    @ParameterizedTest
+    @MethodSource("chatLinkDaoProvider")
     @Transactional
     @Rollback
     @DisplayName("Удаление записи")
-    void remove() {
+    void remove(ChatLinkDao chatLinkDao) {
         // given
         jdbcClient.sql("insert into link (id, url, type) values (1, 'https://aboba1.com', 'GITHUB')").update();
         jdbcClient.sql("insert into chat (id) values (1);").update();
         jdbcClient.sql("insert into chat_link (chat_id, link_id) values (1, 1);").update();
 
         // when
-        jdbcChatLinkDao.remove(1L, 1L);
+        chatLinkDao.remove(1L, 1L);
 
         // then
         Boolean result = jdbcClient.sql("select exists(select 1 from chat_link where link_id = 1 and chat_id = 1)")
@@ -142,8 +173,8 @@ class JdbcChatLinkDaoTest extends IntegrationTest {
     @Test
     @Transactional
     @Rollback
-    @DisplayName("Удаление несуществующей записи")
-    void removeNonexistent() {
+    @DisplayName("Удаление несуществующей записи jdbc")
+    void removeNonexistentJdbc() {
         // when-then
         assertThatThrownBy(() -> jdbcChatLinkDao.remove(1L, 1L)).isInstanceOf(EmptyResultDataAccessException.class);
     }
@@ -151,13 +182,23 @@ class JdbcChatLinkDaoTest extends IntegrationTest {
     @Test
     @Transactional
     @Rollback
+    @DisplayName("Удаление несуществующей записи jooq")
+    void removeNonexistentJooq() {
+        // when-then
+        assertThatThrownBy(() -> jooqChatLinkDao.remove(1L, 1L)).isInstanceOf(NoDataFoundException.class);
+    }
+
+    @ParameterizedTest
+    @MethodSource("chatLinkDaoProvider")
+    @Transactional
+    @Rollback
     @DisplayName("Удаление неотслеживаемых никем ссылок")
-    void removeDanglingLinks() {
+    void removeDanglingLinks(ChatLinkDao chatLinkDao) {
         // given
         jdbcClient.sql("insert into link (id, url, type) values (1, 'https://aboba1.com', 'GITHUB')").update();
 
         // when
-        jdbcChatLinkDao.removeDanglingLinks();
+        chatLinkDao.removeDanglingLinks();
 
         // then
         Boolean result = jdbcClient.sql("select exists(select 1 from link)")

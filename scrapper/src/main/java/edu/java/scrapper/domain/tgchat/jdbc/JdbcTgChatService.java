@@ -1,34 +1,12 @@
 package edu.java.scrapper.domain.tgchat.jdbc;
 
 import edu.java.scrapper.domain.chatlink.jdbc.JdbcChatLinkDao;
-import edu.java.scrapper.domain.exception.ChatAlreadyExistsException;
-import edu.java.scrapper.domain.exception.ResourceNotFoundException;
-import edu.java.scrapper.domain.tgchat.TgChatService;
-import lombok.RequiredArgsConstructor;
+import edu.java.scrapper.domain.tgchat.SchemaTgChatService;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@RequiredArgsConstructor
-public class JdbcTgChatService implements TgChatService {
-    private final JdbcTgChatDao jdbcTgChatDao;
-    private final JdbcChatLinkDao jdbcChatLinkDao;
-
-    @Override
-    public void registerChat(Long id) {
-        jdbcTgChatDao.findById(id).ifPresent(ignored -> {
-            throw new ChatAlreadyExistsException("Указанный чат уже зарегистрирован");
-        });
-        jdbcTgChatDao.add(id);
-    }
-
-    @Override
-    @Transactional
-    public void deleteChat(Long id) {
-        jdbcTgChatDao.findById(id)
-            .ifPresentOrElse(ignored -> jdbcTgChatDao.remove(id), () -> {
-                throw new ResourceNotFoundException("Указанный чат не существует");
-            });
-        jdbcChatLinkDao.removeDanglingLinks();
+public class JdbcTgChatService extends SchemaTgChatService {
+    public JdbcTgChatService(JdbcTgChatDao jdbcTgChatDao, JdbcChatLinkDao jdbcChatLinkDao) {
+        super(jdbcTgChatDao, jdbcChatLinkDao);
     }
 }
