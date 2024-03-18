@@ -1,6 +1,6 @@
 package edu.java.scrapper.scheduler.resourceupdater;
 
-import edu.java.scrapper.domain.links.Link;
+import edu.java.scrapper.domain.links.schemabased.Link;
 import edu.java.scrapper.domain.links.Type;
 import edu.java.scrapper.client.stackoverflow.StackoverflowClient;
 import edu.java.scrapper.client.stackoverflow.dto.StackoverflowAnswers;
