@@ -73,6 +73,10 @@ public class JdbcLinkDao implements LinkDao {
 
     @Override
     public List<Link> updateCheckedTimestamp(List<Long> ids) {
+        if (ids.isEmpty()) {
+            return List.of();
+        }
+
         return jdbcClient.sql("update link set checked_at = default where link.id in (:ids) " + RETURNING_LINK_FIELDS)
             .param("ids", ids)
             .query(Link.class)

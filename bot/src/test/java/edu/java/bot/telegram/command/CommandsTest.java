@@ -4,12 +4,12 @@ import com.pengrad.telegrambot.model.Chat;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
-import edu.java.bot.telegram.linkhandler.LinkHandlerService;
-import edu.java.bot.telegram.link.Link;
-import edu.java.bot.telegram.link.User;
-import edu.java.bot.telegram.link.UserRepository;
+import edu.java.bot.client.scrapper.ScrapperClient;
+import edu.java.bot.client.scrapper.dto.LinkResponse;
+import edu.java.bot.client.scrapper.dto.ListLinkResponse;
+import edu.java.bot.telegram.service.LinkHandlerService;
+import java.net.URI;
 import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,7 +21,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class CommandsTest {
+class CommandsTest {
     @Mock
     Update update;
 
@@ -30,6 +30,9 @@ public class CommandsTest {
 
     @Mock
     Chat chat;
+
+    @Mock
+    ScrapperClient scrapperClient;
 
     @BeforeEach
     void initUpdateObject() {
@@ -74,7 +77,7 @@ public class CommandsTest {
         SendMessage expectedMessage = new SendMessage(
             1L,
             CommandConstants.HELP_RESPONSE + CommandConstants.LISTS_MARKER
-                + command.command() + " " + command.description()
+            + command.command() + " " + command.description()
         );
 
         // when
@@ -90,16 +93,15 @@ public class CommandsTest {
         // given
         when(chat.id()).thenReturn(1L);
         when(message.chat()).thenReturn(chat);
-        UserRepository userRepository = mock(UserRepository.class);
-        User user = new User(1L);
-        Link link = new Link("aboba.com", "https://aboba.com/repository");
-        user.addLink(link);
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        Command command = new ListCommand(userRepository);
+        when(scrapperClient.getFollowedLinks(1L)).thenReturn(new ListLinkResponse(List.of(new LinkResponse(
+            1L,
+            URI.create("https://aboba.com/repository")
+        )), 1));
+        Command command = new ListCommand(scrapperClient);
         SendMessage expectedMessage = new SendMessage(
             1L,
             CommandConstants.LIST_RESPONSE + CommandConstants.LISTS_MARKER
-                + "https://aboba.com/repository" + System.lineSeparator()
+            + "https://aboba.com/repository" + System.lineSeparator()
         );
 
         // when
@@ -115,10 +117,8 @@ public class CommandsTest {
         // given
         when(chat.id()).thenReturn(1L);
         when(message.chat()).thenReturn(chat);
-        UserRepository userRepository = mock(UserRepository.class);
-        User user = new User(1L);
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        Command command = new ListCommand(userRepository);
+        when(scrapperClient.getFollowedLinks(1L)).thenReturn(new ListLinkResponse(List.of(), 0));
+        Command command = new ListCommand(scrapperClient);
         SendMessage expectedMessage = new SendMessage(1L, CommandConstants.LIST_EMPTY_RESPONSE);
 
         // when
@@ -129,14 +129,12 @@ public class CommandsTest {
     }
 
     @Test
-    @DisplayName("Команда /start для нового пользователя")
-    void startCommandNewUser() {
+    @DisplayName("Команда /start")
+    void startCommand() {
         // given
         when(chat.id()).thenReturn(1L);
         when(message.chat()).thenReturn(chat);
-        UserRepository userRepository = mock(UserRepository.class);
-        when(userRepository.findById(1L)).thenReturn(Optional.empty());
-        Command command = new StartCommand(userRepository);
+        Command command = new StartCommand(scrapperClient);
         SendMessage expectedMessage = new SendMessage(1L, CommandConstants.START_NEW_USER_MESSAGE);
 
         // when
@@ -147,16 +145,13 @@ public class CommandsTest {
     }
 
     @Test
-    @DisplayName("Команда /start для зарегестрированного пользователя")
-    void startCommandExistingUser() {
+    @DisplayName("Команда /unregister")
+    void unregisterCommand() {
         // given
         when(chat.id()).thenReturn(1L);
         when(message.chat()).thenReturn(chat);
-        UserRepository userRepository = mock(UserRepository.class);
-        User user = new User(1L);
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        Command command = new StartCommand(userRepository);
-        SendMessage expectedMessage = new SendMessage(1L, CommandConstants.START_EXISTING_USER_MESSAGE);
+        Command command = new UnregisterCommand(scrapperClient);
+        SendMessage expectedMessage = new SendMessage(1L, CommandConstants.UNREGISTER_RESPONSE);
 
         // when
         SendMessage actualMessage = command.handle(update);
@@ -230,7 +225,7 @@ public class CommandsTest {
         String url = "https://aboba.com/repository";
         when(message.text()).thenReturn(CommandConstants.UNTRACK_COMMAND + " " + url);
         LinkHandlerService linkHandlerService = mock(LinkHandlerService.class);
-        when(linkHandlerService.untrackLink(url, 1L)).thenReturn("success");
+        when(linkHandlerService.untrackLink(URI.create(url), 1L)).thenReturn("success");
         Command command = new UntrackCommand(linkHandlerService);
         SendMessage expectedMessage = new SendMessage(1L, "success");
 

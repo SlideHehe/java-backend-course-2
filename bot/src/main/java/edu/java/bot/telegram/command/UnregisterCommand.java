@@ -3,8 +3,6 @@ package edu.java.bot.telegram.command;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
 import edu.java.bot.client.scrapper.ScrapperClient;
-import edu.java.bot.client.scrapper.dto.LinkResponse;
-import edu.java.bot.client.scrapper.dto.ListLinkResponse;
 import edu.java.bot.domain.exception.dto.ApiErrorResponse;
 import edu.java.bot.telegram.service.LinkHandlersConstants;
 import lombok.RequiredArgsConstructor;
@@ -15,25 +13,25 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 
 @RequiredArgsConstructor
 @Component
-public class ListCommand implements Command {
+public class UnregisterCommand implements Command {
     private final ScrapperClient scrapperClient;
 
     @Override
     public String command() {
-        return CommandConstants.LIST_COMMAND;
+        return CommandConstants.UNREGISTER_COMMAND;
     }
 
     @Override
     public String description() {
-        return CommandConstants.LIST_DESCRIPTION;
+        return CommandConstants.UNREGISTER_DESCRIPTION;
     }
 
     @Override
     public SendMessage handle(@NotNull Update update) {
         Long id = update.message().chat().id();
-        ListLinkResponse listLinkResponse;
+
         try {
-            listLinkResponse = scrapperClient.getFollowedLinks(id);
+            scrapperClient.deleteChat(id);
         } catch (WebClientRequestException e) {
             return new SendMessage(id, LinkHandlersConstants.REQUEST_ERROR);
         } catch (WebClientResponseException e) {
@@ -43,21 +41,6 @@ public class ListCommand implements Command {
             return new SendMessage(id, message);
         }
 
-        String response =
-            listLinkResponse.size() == 0 ? CommandConstants.LIST_EMPTY_RESPONSE : getUserResources(listLinkResponse);
-        return new SendMessage(id, response);
-    }
-
-    private String getUserResources(ListLinkResponse listLinkResponse) {
-        StringBuilder stringBuilder = new StringBuilder(CommandConstants.LIST_RESPONSE);
-
-        for (LinkResponse link : listLinkResponse.links()) {
-            stringBuilder
-                .append(CommandConstants.LISTS_MARKER)
-                .append(link.url())
-                .append(System.lineSeparator());
-        }
-
-        return stringBuilder.toString();
+        return new SendMessage(update.message().chat().id(), CommandConstants.UNREGISTER_RESPONSE);
     }
 }

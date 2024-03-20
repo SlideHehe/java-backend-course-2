@@ -1,8 +1,8 @@
 app:
   scheduler:
     enable: true
-    interval: 10s
-    force-check-delay: 10s
+    interval: 30s
+    force-check-delay: 1000s
   client:
     github-api-url: https://api.github.com  # для создание клиента с указанием base URL, пустое поле - используется base URL по умолчанию
     stackoverflow-api-url: https://api.stackexchange.com/2.3

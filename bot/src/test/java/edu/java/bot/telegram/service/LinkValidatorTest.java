@@ -1,25 +1,27 @@
-package edu.java.bot.telegram.linkhandler;
+package edu.java.bot.telegram.service;
 
 import java.net.URI;
 
+import edu.java.bot.telegram.service.linkvalidator.GithubLinkValidator;
+import edu.java.bot.telegram.service.linkvalidator.StackoverflowLinkValidator;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class LinkHandlerTest {
+class LinkValidatorTest {
     @Test
     @DisplayName("Проверка поддержки обработки stackoverlow с допустимой ссылкой")
     void stackoverflowCanHandleCorrectLink() {
         // given
-        StackoverflowLinkHandler stackoverflowLinkHandler = new StackoverflowLinkHandler();
+        StackoverflowLinkValidator stackoverflowLinkHandler = new StackoverflowLinkValidator();
         URI uri = URI.create(
             "https://stackoverflow.com/questions/46502450/interfaces-are-annotated-with-component-annotation-in-spring-ioc-di-what-could"
         );
 
         // when
-        boolean actual = stackoverflowLinkHandler.canHandle(uri);
+        boolean actual = stackoverflowLinkHandler.supports(uri);
 
         // then
         assertThat(actual).isTrue();
@@ -33,11 +35,11 @@ public class LinkHandlerTest {
     @DisplayName("Проверка поддержки обработки stackoverflow с недопустимыми ссылкой")
     void stackoverflowCanHandleIncorrectLinks(String link) {
         // given
-        StackoverflowLinkHandler stackoverflowLinkHandler = new StackoverflowLinkHandler();
+        StackoverflowLinkValidator stackoverflowLinkHandler = new StackoverflowLinkValidator();
         URI uri = URI.create(link);
 
         // when
-        boolean actual = stackoverflowLinkHandler.canHandle(uri);
+        boolean actual = stackoverflowLinkHandler.supports(uri);
 
         // then
         assertThat(actual).isFalse();
@@ -47,13 +49,13 @@ public class LinkHandlerTest {
     @DisplayName("Проверка поддержки обработки github с допустимой ссылкой")
     void githubCanHandleCorrectLink() {
         // given
-        GithubLinkHandler githubLinkHandler = new GithubLinkHandler();
+        GithubLinkValidator githubLinkHandler = new GithubLinkValidator();
         URI uri = URI.create(
             "https://github.com/SlideHehe/java-backend-course-2"
         );
 
         // when
-        boolean actual = githubLinkHandler.canHandle(uri);
+        boolean actual = githubLinkHandler.supports(uri);
 
         // then
         assertThat(actual).isTrue();
@@ -67,11 +69,11 @@ public class LinkHandlerTest {
     @DisplayName("Проверка поддеркжи обработки github с недопустимыми ссылкой")
     void githubCanHandleIncorrectLinks(String link) {
         // given
-        GithubLinkHandler githubLinkHandler = new GithubLinkHandler();
+        GithubLinkValidator githubLinkHandler = new GithubLinkValidator();
         URI uri = URI.create(link);
 
         // when
-        boolean actual = githubLinkHandler.canHandle(uri);
+        boolean actual = githubLinkHandler.supports(uri);
 
         // then
         assertThat(actual).isFalse();

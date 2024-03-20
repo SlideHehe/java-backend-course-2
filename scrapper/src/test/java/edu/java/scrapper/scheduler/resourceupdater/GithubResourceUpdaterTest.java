@@ -76,7 +76,7 @@ class GithubResourceUpdaterTest {
         OffsetDateTime time = OffsetDateTime.now();
         URI uri = URI.create("https://github.com/SlideHehe/java-backend-course-2");
         Link link =
-            new Link(1L, uri, time.minusMinutes(10), time, Type.GITHUB, null, null, null, null);
+            new Link(1L, uri, time.minusMinutes(10), time.minusMinutes(10), Type.GITHUB, null, null, null, null);
         GithubRepository repository =
             new GithubRepository(
                 "java-backend-course-2",
@@ -91,7 +91,7 @@ class GithubResourceUpdaterTest {
         when(githubClient.getCommits("SlideHehe", "java-backend-course-2")).thenReturn(List.of());
         Optional<UpdateInfo> expectedUpdateInfo =
             Optional.of(new UpdateInfo(
-                new Link(1L, uri, time.minusMinutes(5), time, Type.GITHUB, null, null, 1, 0),
+                new Link(1L, uri, time.minusMinutes(5), time.minusMinutes(10), Type.GITHUB, null, null, 1, 0),
                 ResourceUpdaterConstants.GITHUB_UPDATE_RESPONSE.formatted("java-backend-course-2")
                 + ResourceUpdaterConstants.GITHUB_NEW_PULL_REQUEST.formatted("hello")
             ));
@@ -142,7 +142,7 @@ class GithubResourceUpdaterTest {
         OffsetDateTime time = OffsetDateTime.now();
         URI uri = URI.create("https://github.com/SlideHehe/java-backend-course-2");
         Link link =
-            new Link(1L, uri, time.minusMinutes(10), time, Type.GITHUB, null, null, null, null);
+            new Link(1L, uri, time.minusMinutes(10), time.minusMinutes(10), Type.GITHUB, null, null, null, null);
         GithubRepository repository =
             new GithubRepository(
                 "java-backend-course-2",
@@ -157,7 +157,7 @@ class GithubResourceUpdaterTest {
         when(githubClient.getCommits("SlideHehe", "java-backend-course-2")).thenReturn(githubCommits);
         Optional<UpdateInfo> expectedUpdateInfo =
             Optional.of(new UpdateInfo(
-                new Link(1L, uri, time.minusMinutes(5), time, Type.GITHUB, null, null, 0, 1),
+                new Link(1L, uri, time.minusMinutes(5), time.minusMinutes(10), Type.GITHUB, null, null, 0, 1),
                 ResourceUpdaterConstants.GITHUB_UPDATE_RESPONSE.formatted("java-backend-course-2")
                 + ResourceUpdaterConstants.GITHUB_NEW_COMMIT.formatted("SlideHehe", "message")
             ));

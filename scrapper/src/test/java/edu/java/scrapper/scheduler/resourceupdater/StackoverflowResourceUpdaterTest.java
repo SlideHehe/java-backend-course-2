@@ -107,7 +107,7 @@ class StackoverflowResourceUpdaterTest {
         OffsetDateTime time = OffsetDateTime.now();
         URI uri = URI.create(
             "https://stackoverflow.com/questions/61719589/do-you-need-to-override-hashcode-and-equals-for-records");
-        Link link = new Link(1L, uri, time.minusMinutes(10), time, Type.STACKOVERFLOW, null, null, null, null);
+        Link link = new Link(1L, uri, time.minusMinutes(10), time.minusMinutes(10), Type.STACKOVERFLOW, null, null, null, null);
         StackoverflowQuestion question = new StackoverflowQuestion(List.of(new StackoverflowQuestion.Item(
             "aboba",
             "https://stackoverflow.com/questions/61719589/do-you-need-to-override-hashcode-and-equals-for-records",
@@ -120,7 +120,7 @@ class StackoverflowResourceUpdaterTest {
         when(stackoverflowClient.getComments(61719589L)).thenReturn(new StackoverflowComments(List.of()));
         Optional<UpdateInfo> expectedUpdateInfo =
             Optional.of(new UpdateInfo(
-                new Link(1L, uri, time.minusMinutes(5), time, Type.STACKOVERFLOW, 1, 0, null, null),
+                new Link(1L, uri, time.minusMinutes(5), time.minusMinutes(10), Type.STACKOVERFLOW, 1, 0, null, null),
                 ResourceUpdaterConstants.STACKOVERFLOW_UPDATE_RESPONSE.formatted(
                     "aboba")
                 + ResourceUpdaterConstants.STACKOVERFLOW_NEW_ANSWER.formatted("aaa")
@@ -171,7 +171,8 @@ class StackoverflowResourceUpdaterTest {
         OffsetDateTime time = OffsetDateTime.now();
         URI uri = URI.create(
             "https://stackoverflow.com/questions/61719589/do-you-need-to-override-hashcode-and-equals-for-records");
-        Link link = new Link(1L, uri, time.minusMinutes(10), time, Type.STACKOVERFLOW, null, null, null, null);
+        Link link =
+            new Link(1L, uri, time.minusMinutes(10), time.minusMinutes(10), Type.STACKOVERFLOW, null, null, null, null);
         StackoverflowQuestion question = new StackoverflowQuestion(List.of(new StackoverflowQuestion.Item(
             "aboba",
             "https://stackoverflow.com/questions/61719589/do-you-need-to-override-hashcode-and-equals-for-records",
@@ -184,7 +185,7 @@ class StackoverflowResourceUpdaterTest {
         )));
         Optional<UpdateInfo> expectedUpdateInfo =
             Optional.of(new UpdateInfo(
-                new Link(1L, uri, time.minusMinutes(5), time, Type.STACKOVERFLOW, 0, 1, null, null),
+                new Link(1L, uri, time.minusMinutes(5), time.minusMinutes(10), Type.STACKOVERFLOW, 0, 1, null, null),
                 ResourceUpdaterConstants.STACKOVERFLOW_UPDATE_RESPONSE.formatted(
                     "aboba")
                 + ResourceUpdaterConstants.STACKOVERFLOW_NEW_COMMENT.formatted("aaa")

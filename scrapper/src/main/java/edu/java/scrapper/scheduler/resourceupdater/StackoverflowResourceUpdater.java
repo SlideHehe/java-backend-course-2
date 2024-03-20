@@ -68,8 +68,8 @@ public class StackoverflowResourceUpdater implements ResourceUpdater {
         }
 
         String description = ResourceUpdaterConstants.STACKOVERFLOW_UPDATE_RESPONSE.formatted(questionItem.title())
-                             + generateAnswersMessage(link, stackoverflowAnswers, questionItem.lastActivityDate())
-                             + generateCommentsMessage(link, stackoverflowComments, questionItem.lastActivityDate());
+                             + generateAnswersMessage(link, stackoverflowAnswers, link.checkedAt())
+                             + generateCommentsMessage(link, stackoverflowComments, link.checkedAt());
 
         return Optional.of(
             createUpdateInfo(
@@ -84,7 +84,7 @@ public class StackoverflowResourceUpdater implements ResourceUpdater {
     private String generateAnswersMessage(
         Link link,
         StackoverflowAnswers answers,
-        OffsetDateTime updatedAt
+        OffsetDateTime checkedAt
     ) {
         int answerCount = link.answerCount() == null ? 0 : link.answerCount();
 
@@ -95,7 +95,7 @@ public class StackoverflowResourceUpdater implements ResourceUpdater {
         if (answers.items().size() > answerCount) {
             StringBuilder stringBuilder = new StringBuilder();
             answers.items().stream()
-                .filter(item -> item.creationDate().isAfter(updatedAt))
+                .filter(item -> item.creationDate().isAfter(checkedAt))
                 .forEach(item -> stringBuilder.append(ResourceUpdaterConstants.STACKOVERFLOW_NEW_ANSWER
                     .formatted(item.owner().name())));
 
@@ -108,7 +108,7 @@ public class StackoverflowResourceUpdater implements ResourceUpdater {
     private String generateCommentsMessage(
         Link link,
         StackoverflowComments comments,
-        OffsetDateTime updatedAt
+        OffsetDateTime checkedAt
     ) {
         int commentCount = link.commentCount() == null ? 0 : link.commentCount();
 
@@ -119,7 +119,7 @@ public class StackoverflowResourceUpdater implements ResourceUpdater {
         if (comments.items().size() > commentCount) {
             StringBuilder stringBuilder = new StringBuilder();
             comments.items().stream()
-                .filter(item -> item.creationDate().isAfter(updatedAt))
+                .filter(item -> item.creationDate().isAfter(checkedAt))
                 .forEach(item -> stringBuilder.append(ResourceUpdaterConstants.STACKOVERFLOW_NEW_COMMENT
                     .formatted(item.owner().name())));
 
