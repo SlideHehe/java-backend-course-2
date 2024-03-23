@@ -30,11 +30,20 @@ public class LinkTrackerBot implements Bot {
     @Override
     public int process(@NotNull List<Update> updates) {
         for (Update update : updates) {
-            SendMessage message = commandService.process(update);
-            execute(message);
+            if (updateValid(update)) {
+                SendMessage message = commandService.process(update);
+                execute(message);
+            }
         }
 
         return CONFIRMED_UPDATES_ALL;
+    }
+
+    private boolean updateValid(Update update) {
+        return update != null
+               && update.message() != null
+               && update.message().text() != null
+               && update.message().chat().id() != null;
     }
 
     @Override
