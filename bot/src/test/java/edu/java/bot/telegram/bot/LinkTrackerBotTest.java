@@ -1,6 +1,8 @@
 package edu.java.bot.telegram.bot;
 
 import com.pengrad.telegrambot.TelegramBot;
+import com.pengrad.telegrambot.model.Chat;
+import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
 import edu.java.bot.configuration.ApplicationConfig;
@@ -13,12 +15,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class LinkTrackerBotTest {
+class LinkTrackerBotTest {
     @Mock
     CommandService commandService;
 
@@ -49,8 +52,15 @@ public class LinkTrackerBotTest {
     void processMethodSingleElementList() {
         // given
         SendMessage sendMessage = new SendMessage(1L, "hello");
+        Chat chat = mock(Chat.class);
+        Message message = mock(Message.class);
+        Update update = mock(Update.class);
         when(commandService.process(any(Update.class))).thenReturn(sendMessage);
-        List<Update> updateList = List.of(new Update());
+        when(chat.id()).thenReturn(1L);
+        when(message.chat()).thenReturn(chat);
+        when(message.text()).thenReturn("hello");
+        when(update.message()).thenReturn(message);
+        List<Update> updateList = List.of(update);
 
         // when
         linkTrackerBot.process(updateList);
@@ -64,8 +74,15 @@ public class LinkTrackerBotTest {
     void processMethodMultipleElementsList() {
         // given
         SendMessage sendMessage = new SendMessage(1L, "hello");
+        Chat chat = mock(Chat.class);
+        Message message = mock(Message.class);
+        Update update = mock(Update.class);
+        when(chat.id()).thenReturn(1L);
+        when(message.chat()).thenReturn(chat);
+        when(message.text()).thenReturn("hello");
+        when(update.message()).thenReturn(message);
         when(commandService.process(any(Update.class))).thenReturn(sendMessage);
-        List<Update> updateList = List.of(new Update(), new Update(), new Update());
+        List<Update> updateList = List.of(update, update, update);
 
         // when
         linkTrackerBot.process(updateList);
