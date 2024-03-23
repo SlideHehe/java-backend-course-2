@@ -3,6 +3,7 @@ package edu.java.scrapper.domain.links.schemabased;
 import edu.java.scrapper.domain.chatlink.schemabased.ChatLinkDao;
 import edu.java.scrapper.domain.exception.LinkAlreadyExistsException;
 import edu.java.scrapper.domain.exception.ResourceNotFoundException;
+import edu.java.scrapper.domain.links.LinkMapper;
 import edu.java.scrapper.domain.links.LinkService;
 import edu.java.scrapper.domain.links.Type;
 import edu.java.scrapper.domain.links.dto.AddLinkRequest;
@@ -22,7 +23,7 @@ public class SchemaBasedLinkService implements LinkService {
     @Override
     public ListLinkResponse getFollowedLinks(Long tgChatId) {
         List<LinkResponse> linkResponses = linkDao.findAllByChatId(tgChatId).stream()
-            .map(LinkMapper::linkToLinkResponse)
+            .map(LinkMapper::linkSchemaToLinkResponse)
             .toList();
 
         return new ListLinkResponse(
@@ -48,14 +49,14 @@ public class SchemaBasedLinkService implements LinkService {
             throw new ResourceNotFoundException("Указанный чат не зарегистрирован");
         }
 
-        return LinkMapper.linkToLinkResponse(link);
+        return LinkMapper.linkSchemaToLinkResponse(link);
     }
 
     @Override
     @Transactional
     public LinkResponse removeLink(Long tgChatId, RemoveLinkRequest removeLinkRequest) {
         Link link = linkDao.findByUrl(removeLinkRequest.link())
-            .orElseThrow(() -> new ResourceNotFoundException("Указанная не существует в системе"));
+            .orElseThrow(() -> new ResourceNotFoundException("Указанная ссылка не существует в системе"));
 
         chatLinkDao.findById(tgChatId, link.id())
             .orElseThrow(() -> new ResourceNotFoundException("Указанная ссылка не отслеживается"));
@@ -63,6 +64,6 @@ public class SchemaBasedLinkService implements LinkService {
         chatLinkDao.remove(tgChatId, link.id());
         chatLinkDao.removeDanglingLinks();
 
-        return LinkMapper.linkToLinkResponse(link);
+        return LinkMapper.linkSchemaToLinkResponse(link);
     }
 }
