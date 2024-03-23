@@ -7,9 +7,7 @@ import edu.java.scrapper.domain.tgchat.schemabased.jooq.JooqTgChatDao;
 import edu.java.scrapper.scheduler.resourceupdater.ResourceUpdater;
 import edu.java.scrapper.scheduler.schemabased.SchemaBasedLinkUpdater;
 import java.util.List;
-import org.springframework.stereotype.Service;
 
-@Service
 public class JooqSchemaBasedLinkUpdater extends SchemaBasedLinkUpdater {
     public JooqSchemaBasedLinkUpdater(
         JooqTgChatDao jooqTgChatDao,

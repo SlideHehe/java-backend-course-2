@@ -7,6 +7,7 @@ app:
     github-api-url: https://api.github.com  # для создание клиента с указанием base URL, пустое поле - используется base URL по умолчанию
     stackoverflow-api-url: https://api.stackexchange.com/2.3
     bot-api-url: http://localhost:8090
+  database-access-type: jpa
 
 spring:
   application:

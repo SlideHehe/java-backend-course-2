@@ -5,11 +5,9 @@ import edu.java.scrapper.domain.exception.ResourceNotFoundException;
 import edu.java.scrapper.domain.links.jpa.JpaLinkRepository;
 import edu.java.scrapper.domain.tgchat.TgChatService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
-@Service
 public class JpaTgChatService implements TgChatService {
     private final JpaChatRepository jpaChatRepository;
     private final JpaLinkRepository jpaLinkRepository;

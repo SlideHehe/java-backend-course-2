@@ -14,10 +14,8 @@ import edu.java.scrapper.domain.tgchat.jpa.JpaChatRepository;
 import java.net.URI;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Service
 @RequiredArgsConstructor
 public class JpaLinkService implements LinkService {
     private static final String UNREGISTERED = "Указанный чат не зарегистрирован";
@@ -78,6 +76,7 @@ public class JpaLinkService implements LinkService {
         chat.removeLink(link);
         jpaChatRepository.save(chat);
         jpaLinkRepository.save(link);
+        jpaLinkRepository.deleteAllByChatsEmpty();
 
         return LinkMapper.linkEntityToLinkResponse(link);
     }
