@@ -32,8 +32,8 @@ public class LinkHandlerService {
             return LinkHandlersConstants.REQUEST_ERROR;
         } catch (WebClientResponseException e) {
             ApiErrorResponse errorResponse = e.getResponseBodyAs(ApiErrorResponse.class);
-            return errorResponse != null && errorResponse.description() != null
-                ? errorResponse.description() : LinkHandlersConstants.UNKNOWN_RESPONSE_ERROR;
+            return errorResponse != null && errorResponse.exceptionMessage() != null
+                ? errorResponse.exceptionMessage() : LinkHandlersConstants.UNKNOWN_RESPONSE_ERROR;
         }
 
         return LinkHandlersConstants.UNTRACKED.formatted(linkResponse.url());
@@ -73,8 +73,8 @@ public class LinkHandlerService {
             return LinkHandlersConstants.REQUEST_ERROR;
         } catch (WebClientResponseException e) {
             ApiErrorResponse errorResponse = e.getResponseBodyAs(ApiErrorResponse.class);
-            return errorResponse != null && errorResponse.description() != null
-                ? errorResponse.description() : LinkHandlersConstants.UNKNOWN_RESPONSE_ERROR;
+            return errorResponse != null && errorResponse.exceptionMessage() != null
+                ? errorResponse.exceptionMessage() : LinkHandlersConstants.UNKNOWN_RESPONSE_ERROR;
         }
 
         return LinkHandlersConstants.NOW_TRACKING.formatted(linkResponse.url());

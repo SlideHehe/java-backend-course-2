@@ -38,8 +38,8 @@ public class ListCommand implements Command {
             return new SendMessage(id, LinkHandlersConstants.REQUEST_ERROR);
         } catch (WebClientResponseException e) {
             ApiErrorResponse errorResponse = e.getResponseBodyAs(ApiErrorResponse.class);
-            String message = errorResponse != null && errorResponse.description() != null
-                ? errorResponse.description() : LinkHandlersConstants.UNKNOWN_RESPONSE_ERROR;
+            String message = errorResponse != null && errorResponse.exceptionMessage() != null
+                ? errorResponse.exceptionMessage() : LinkHandlersConstants.UNKNOWN_RESPONSE_ERROR;
             return new SendMessage(id, message);
         }
 
