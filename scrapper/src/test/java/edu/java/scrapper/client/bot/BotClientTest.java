@@ -47,7 +47,6 @@ public class BotClientTest {
             .withHeader("Content-Type", equalTo(MediaType.APPLICATION_JSON_VALUE))
             .withRequestBody(equalToJson("""
                 {
-                    "id": 1,
                     "url": "https://aboba.com/question",
                     "description": "description",
                     "tgChatIds": [1, 2, 3]
@@ -57,7 +56,6 @@ public class BotClientTest {
                 .withStatus(200)));
         LinkUpdateRequest linkUpdateRequest =
             new LinkUpdateRequest(
-                1L,
                 URI.create("https://aboba.com/question"),
                 "description",
                 List.of(1L, 2L, 3L)
@@ -77,7 +75,6 @@ public class BotClientTest {
                 .withStatus(400)));
         LinkUpdateRequest linkUpdateRequest =
             new LinkUpdateRequest(
-                1L,
                 URI.create("https://aboba.com/question"),
                 "description",
                 List.of(1L, 2L, 3L)

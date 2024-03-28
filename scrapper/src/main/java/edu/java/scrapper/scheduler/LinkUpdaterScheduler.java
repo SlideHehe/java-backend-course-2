@@ -1,16 +1,18 @@
 package edu.java.scrapper.scheduler;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-@Slf4j
 @Component
+@RequiredArgsConstructor
 @ConditionalOnProperty(name = "app.scheduler.enable")
 public class LinkUpdaterScheduler {
+    private final LinkUpdater jdbcLinkUpdater;
+
     @Scheduled(fixedDelayString = "#{@scheduler.interval}")
     public void update() {
-        log.info("Update method call");
+        jdbcLinkUpdater.update();
     }
 }

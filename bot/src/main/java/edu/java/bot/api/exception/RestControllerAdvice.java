@@ -17,14 +17,4 @@ public class RestControllerAdvice {
             exception
         );
     }
-
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler
-    public ApiErrorResponse handleUpdateAlreadyExists(UpdateAlreadyExistsException exception) {
-        return ApiErrorResponse.create(
-            "Невозможно добавить уже существующий update",
-            HttpStatus.BAD_REQUEST.toString(),
-            exception
-        );
-    }
 }
