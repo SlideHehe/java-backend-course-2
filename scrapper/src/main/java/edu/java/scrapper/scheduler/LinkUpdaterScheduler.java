@@ -9,10 +9,10 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 @ConditionalOnProperty(name = "app.scheduler.enable")
 public class LinkUpdaterScheduler {
-    private final LinkUpdater jdbcLinkUpdater;
+    private final LinkUpdater jdbcSchemaBasedLinkUpdater;
 
     @Scheduled(fixedDelayString = "#{@scheduler.interval}")
     public void update() {
-        jdbcLinkUpdater.update();
+//        jdbcLinkUpdater.update();
     }
 }

@@ -2,6 +2,8 @@ package edu.java.scrapper.client.stackoverflow;
 
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import edu.java.scrapper.client.ClientFactory;
+import edu.java.scrapper.client.stackoverflow.dto.StackoverflowAnswers;
+import edu.java.scrapper.client.stackoverflow.dto.StackoverflowComments;
 import edu.java.scrapper.client.stackoverflow.dto.StackoverflowQuestion;
 import edu.java.scrapper.configuration.ApplicationConfig;
 import java.time.OffsetDateTime;
@@ -13,7 +15,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.core.codec.DecodingException;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClientException;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
@@ -40,7 +41,7 @@ public class StackoverflowClientTest {
     }
 
     @Test
-    @DisplayName("Успешный запрос")
+    @DisplayName("Запрос получения вопроса")
     void getQuestionSuccess() {
         // given
         OffsetDateTime offsetDateTime = OffsetDateTime.of(2024, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC);
@@ -52,6 +53,7 @@ public class StackoverflowClientTest {
                     {
                         "items": [
                             {
+                                "title": "what-is-the-operator-in-c-c",
                                 "link": "https://stackoverflow.com/questions/1642028/what-is-the-operator-in-c-c",
                                 "last_activity_date": "%s"
                             }
@@ -61,6 +63,7 @@ public class StackoverflowClientTest {
         StackoverflowClient stackoverflowClient = ClientFactory.createStackoverflowClient(applicationConfig);
         StackoverflowQuestion expectedQuestion = new StackoverflowQuestion(
             List.of(new StackoverflowQuestion.Item(
+                "what-is-the-operator-in-c-c",
                 "https://stackoverflow.com/questions/1642028/what-is-the-operator-in-c-c",
                 offsetDateTime
             ))
@@ -74,19 +77,73 @@ public class StackoverflowClientTest {
     }
 
     @Test
-    @DisplayName("Запрос с неверным телом ответа")
-    void getQuestionWrongBody() {
+    @DisplayName("Запрос получения ответов")
+    void getAnswersSuccess() {
         // given
-        stubFor(get(urlPathMatching("/questions/1642028"))
+        OffsetDateTime offsetDateTime = OffsetDateTime.of(2024, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC);
+        stubFor(get(urlPathMatching("/questions/1642028/answers"))
             .willReturn(aResponse()
                 .withStatus(200)
                 .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-                .withBody("notjson")));
+                .withBody("""
+                    {
+                        "items": [
+                            {
+                                "owner": {
+                                    "name": "aboba"
+                                },
+                                "creation_date": "%s"
+                            }
+                        ]
+                    }
+                    """.formatted(offsetDateTime))));
         StackoverflowClient stackoverflowClient = ClientFactory.createStackoverflowClient(applicationConfig);
+        StackoverflowAnswers expectedAnswers = new StackoverflowAnswers(
+            List.of(
+                new StackoverflowAnswers.Item(new StackoverflowAnswers.Item.Owner("aboba"), offsetDateTime)
+            )
+        );
 
-        // when-then
-        assertThatThrownBy(() -> stackoverflowClient.getQuestion(1642028L))
-            .isInstanceOf(DecodingException.class);
+        // when
+        StackoverflowAnswers actualAnswers = stackoverflowClient.getAnswers(1642028L);
+
+        // then
+        assertThat(actualAnswers).isEqualTo(expectedAnswers);
+    }
+
+    @Test
+    @DisplayName("Запрос получения комментариев")
+    void getCommentsSuccess() {
+        // given
+        OffsetDateTime offsetDateTime = OffsetDateTime.of(2024, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC);
+        stubFor(get(urlPathMatching("/questions/1642028/comments"))
+            .willReturn(aResponse()
+                .withStatus(200)
+                .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+                .withBody("""
+                    {
+                        "items": [
+                            {
+                                "owner": {
+                                    "name": "aboba"
+                                },
+                                "creation_date": "%s"
+                            }
+                        ]
+                    }
+                    """.formatted(offsetDateTime))));
+        StackoverflowClient stackoverflowClient = ClientFactory.createStackoverflowClient(applicationConfig);
+        StackoverflowComments expectedComments = new StackoverflowComments(
+            List.of(
+                new StackoverflowComments.Item(new StackoverflowComments.Item.Owner("aboba"), offsetDateTime)
+            )
+        );
+
+        // when
+        StackoverflowComments actualComments = stackoverflowClient.getComments(1642028L);
+
+        // then
+        assertThat(actualComments).isEqualTo(expectedComments);
     }
 
     @Test
@@ -97,7 +154,7 @@ public class StackoverflowClientTest {
             .willReturn(aResponse()
                 .withStatus(418)
                 .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-                .withBody("notjson")));
+                .withBody("{}")));
         StackoverflowClient stackoverflowClient = ClientFactory.createStackoverflowClient(applicationConfig);
 
         // when-then
