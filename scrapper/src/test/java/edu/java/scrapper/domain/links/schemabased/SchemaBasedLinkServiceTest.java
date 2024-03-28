@@ -9,8 +9,6 @@ import edu.java.scrapper.domain.links.dto.AddLinkRequest;
 import edu.java.scrapper.domain.links.dto.LinkResponse;
 import edu.java.scrapper.domain.links.dto.ListLinkResponse;
 import edu.java.scrapper.domain.links.dto.RemoveLinkRequest;
-import edu.java.scrapper.domain.links.schemabased.Link;
-import edu.java.scrapper.domain.links.schemabased.SchemaBasedLinkService;
 import edu.java.scrapper.domain.links.schemabased.jdbc.JdbcLinkDao;
 import java.net.URI;
 import java.time.OffsetDateTime;
@@ -192,10 +190,12 @@ class SchemaBasedLinkServiceTest {
         // given
         URI uri = URI.create("https://github.com");
         when(jdbcLinkDao.findByUrl(uri)).thenReturn(Optional.empty());
+        RemoveLinkRequest removeLinkRequest = new RemoveLinkRequest(uri);
+
         // when-then
-        assertThatThrownBy(() -> linkService.removeLink(1L, new RemoveLinkRequest(uri)))
+        assertThatThrownBy(() -> linkService.removeLink(1L, removeLinkRequest))
             .isInstanceOf(ResourceNotFoundException.class)
-            .hasMessage("Указанная не существует в системе");
+            .hasMessage("Указанная ссылка не существует в системе");
     }
 
     @Test
@@ -215,8 +215,10 @@ class SchemaBasedLinkServiceTest {
             null
         )));
         when(jdbcChatLinkDao.findById(1L, 1L)).thenReturn(Optional.empty());
+        RemoveLinkRequest removeLinkRequest = new RemoveLinkRequest(uri);
+
         // when-then
-        assertThatThrownBy(() -> linkService.removeLink(1L, new RemoveLinkRequest(uri)))
+        assertThatThrownBy(() -> linkService.removeLink(1L, removeLinkRequest))
             .isInstanceOf(ResourceNotFoundException.class)
             .hasMessage("Указанная ссылка не отслеживается");
     }

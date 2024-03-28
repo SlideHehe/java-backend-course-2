@@ -65,6 +65,10 @@ public class JooqLinkDao implements LinkDao {
 
     @Override
     public List<Link> updateCheckedTimestamp(List<Long> ids) {
+        if (ids.isEmpty()) {
+            return List.of();
+        }
+
         return context.update(LINK)
             .set(LINK.CHECKED_AT, OffsetDateTime.now())
             .where(LINK.ID.in(ids))
@@ -84,7 +88,7 @@ public class JooqLinkDao implements LinkDao {
             .set(LINK.ANSWER_COUNT, answerCount)
             .set(LINK.COMMENT_COUNT, commentCount)
             .set(LINK.PULL_REQUEST_COUNT, pullRequestCount)
-            .set(LINK.COMMIT_COUNT, commentCount)
+            .set(LINK.COMMIT_COUNT, commitCount)
             .where(LINK.ID.eq(id))
             .returningResult(LINK)
             .fetchSingleInto(Link.class);

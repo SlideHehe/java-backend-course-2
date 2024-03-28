@@ -69,8 +69,8 @@ public class GithubResourceUpdater implements ResourceUpdater {
         }
 
         String description = ResourceUpdaterConstants.GITHUB_UPDATE_RESPONSE.formatted(githubRepository.name())
-                             + generatePullRequestsMessage(link, githubPullRequests, githubRepository.updatedAt())
-                             + generateCommitsMessage(link, githubCommits, githubRepository.updatedAt());
+                             + generatePullRequestsMessage(link, githubPullRequests, link.checkedAt())
+                             + generateCommitsMessage(link, githubCommits, link.checkedAt());
 
         return Optional.of(
             createUpdateInfo(
@@ -85,7 +85,7 @@ public class GithubResourceUpdater implements ResourceUpdater {
     private String generatePullRequestsMessage(
         Link link,
         List<GithubPullRequest> githubPullRequests,
-        OffsetDateTime updatedAt
+        OffsetDateTime checkedAt
     ) {
         int pullRequestCount = link.pullRequestCount() == null ? 0 : link.pullRequestCount();
 
@@ -96,7 +96,7 @@ public class GithubResourceUpdater implements ResourceUpdater {
         if (githubPullRequests.size() > pullRequestCount) {
             StringBuilder stringBuilder = new StringBuilder();
             githubPullRequests.stream()
-                .filter(githubPullRequest -> githubPullRequest.createdAt().isAfter(updatedAt))
+                .filter(githubPullRequest -> githubPullRequest.createdAt().isAfter(checkedAt))
                 .forEach(githubPullRequest -> stringBuilder.append(ResourceUpdaterConstants.GITHUB_NEW_PULL_REQUEST
                     .formatted(githubPullRequest.title())));
 
@@ -109,7 +109,7 @@ public class GithubResourceUpdater implements ResourceUpdater {
     private String generateCommitsMessage(
         Link link,
         List<GithubCommit> githubCommits,
-        OffsetDateTime updatedAt
+        OffsetDateTime checkedAt
     ) {
         int commitCount = link.commitCount() == null ? 0 : link.commitCount();
 
@@ -120,7 +120,7 @@ public class GithubResourceUpdater implements ResourceUpdater {
         if (githubCommits.size() > commitCount) {
             StringBuilder stringBuilder = new StringBuilder();
             githubCommits.stream()
-                .filter(githubCommit -> githubCommit.commit().author().date().isAfter(updatedAt))
+                .filter(githubCommit -> githubCommit.commit().author().date().isAfter(checkedAt))
                 .forEach(githubCommit -> stringBuilder.append(ResourceUpdaterConstants.GITHUB_NEW_COMMIT
                     .formatted(githubCommit.commit().author().name(), githubCommit.commit().message())));
 

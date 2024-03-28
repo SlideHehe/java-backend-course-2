@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
+@SuppressWarnings("MultipleStringLiterals")
 @RequiredArgsConstructor
 @Repository
 public class JdbcChatLinkDao implements ChatLinkDao {
@@ -22,9 +23,10 @@ public class JdbcChatLinkDao implements ChatLinkDao {
 
     @Override
     public Optional<ChatLink> findById(Long chatId, Long linkId) {
-        return jdbcClient.sql(
-                "select chat_link.chat_id, chat_link.link_id from chat_link where chat_id = ? and link_id = ?")
-            .params(chatId, linkId)
+        return jdbcClient.sql("select chat_link.chat_id, chat_link.link_id from chat_link "
+                              + "where chat_id = :chatId and link_id = :linkId")
+            .param("chatId", chatId)
+            .param("linkId", linkId)
             .query(ChatLink.class)
             .optional();
     }
@@ -32,8 +34,10 @@ public class JdbcChatLinkDao implements ChatLinkDao {
     @Override
     public ChatLink add(Long chatId, Long linkId) {
         return jdbcClient.sql(
-                "insert into chat_link (chat_id, link_id) values (?, ?) returning chat_link.chat_id, chat_link.link_id")
-            .params(chatId, linkId)
+                "insert into chat_link (chat_id, link_id) values (:chatId, :linkId) "
+                + "returning chat_link.chat_id, chat_link.link_id")
+            .param("chatId", chatId)
+            .param("linkId", linkId)
             .query(ChatLink.class)
             .single();
     }
@@ -41,9 +45,10 @@ public class JdbcChatLinkDao implements ChatLinkDao {
     @Override
     public ChatLink remove(Long chatId, Long linkId) {
         return jdbcClient.sql(
-                "delete from chat_link where chat_id = ? and link_id = ? "
-                    + "returning chat_link.chat_id, chat_link.link_id")
-            .params(chatId, linkId)
+                "delete from chat_link where chat_id = :chatId and link_id = :linkId "
+                + "returning chat_link.chat_id, chat_link.link_id")
+            .param("chatId", chatId)
+            .param("linkId", linkId)
             .query(ChatLink.class)
             .single();
     }

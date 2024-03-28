@@ -2,7 +2,7 @@ package edu.java.bot.telegram.command;
 
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
-import edu.java.bot.telegram.linkhandler.LinkHandlerService;
+import edu.java.bot.telegram.service.LinkHandlerService;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
