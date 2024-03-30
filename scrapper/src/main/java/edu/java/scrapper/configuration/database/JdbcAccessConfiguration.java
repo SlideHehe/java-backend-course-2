@@ -1,6 +1,7 @@
-package edu.java.scrapper.configuration;
+package edu.java.scrapper.configuration.database;
 
 import edu.java.scrapper.client.bot.BotClient;
+import edu.java.scrapper.configuration.ApplicationConfig;
 import edu.java.scrapper.domain.chatlink.schemabased.jdbc.JdbcChatLinkDao;
 import edu.java.scrapper.domain.links.LinkService;
 import edu.java.scrapper.domain.links.schemabased.jdbc.JdbcLinkDao;

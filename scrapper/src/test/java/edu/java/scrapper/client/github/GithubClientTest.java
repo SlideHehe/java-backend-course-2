@@ -1,15 +1,18 @@
 package edu.java.scrapper.client.github;
 
+import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import edu.java.scrapper.client.ClientFactory;
+import edu.java.scrapper.client.exchangefilterfunction.LinearRetryFilter;
 import edu.java.scrapper.client.github.dto.GithubCommit;
 import edu.java.scrapper.client.github.dto.GithubPullRequest;
 import edu.java.scrapper.client.github.dto.GithubRepository;
 import edu.java.scrapper.configuration.ApplicationConfig;
-import edu.java.scrapper.configuration.ApplicationConfig.Client;
+import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,6 +23,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClientException;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -28,17 +32,31 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @WireMockTest(httpPort = 8080)
-public class GithubClientTest {
+class GithubClientTest {
     @Mock
     ApplicationConfig applicationConfig;
 
     @Mock
-    Client client;
+    ApplicationConfig.Client client;
+    @Mock
+    ApplicationConfig.Client.Retry retry;
+    ClientFactory clientFactory;
 
     @BeforeEach
     void setupConfig() {
-        when(client.githubApiUrl()).thenReturn("http://localhost:8080");
-        when(applicationConfig.client()).thenReturn(client);
+        when(retry.maxAttempts()).thenReturn(3);
+        when(retry.initialBackoff()).thenReturn(Duration.ofSeconds(1));
+        when(retry.retryableCodes()).thenReturn(Set.of(500));
+        when(client.retry()).thenReturn(retry);
+        when(client.baseUrl()).thenReturn("http://localhost:8080");
+        when(applicationConfig.githubClient()).thenReturn(client);
+        LinearRetryFilter linearRetryFilter = new LinearRetryFilter(client);
+        clientFactory = new ClientFactory(
+            applicationConfig,
+            linearRetryFilter,
+            linearRetryFilter,
+            linearRetryFilter
+        );
     }
 
     @Test
@@ -57,7 +75,7 @@ public class GithubClientTest {
                         "updated_at": "%s"
                     }
                     """.formatted(offsetDateTime))));
-        GithubClient githubClient = ClientFactory.createGithubclient(applicationConfig);
+        GithubClient githubClient = clientFactory.createGithubclient();
         GithubRepository expectedRepository = new GithubRepository(
             "java-backend-course-2",
             "https://github.com/SlideHehe/java-backend-course-2",
@@ -92,7 +110,7 @@ public class GithubClientTest {
                         }
                     ]
                     """.formatted(offsetDateTime, offsetDateTime))));
-        GithubClient githubClient = ClientFactory.createGithubclient(applicationConfig);
+        GithubClient githubClient = clientFactory.createGithubclient();
         List<GithubPullRequest> expectedPullRequests = List.of(
             new GithubPullRequest("homework1", offsetDateTime),
             new GithubPullRequest("homework2", offsetDateTime)
@@ -136,7 +154,7 @@ public class GithubClientTest {
                         }
                     ]
                     """.formatted(offsetDateTime, offsetDateTime))));
-        GithubClient githubClient = ClientFactory.createGithubclient(applicationConfig);
+        GithubClient githubClient = clientFactory.createGithubclient();
         List<GithubCommit> expectedCommits = List.of(
             new GithubCommit(new GithubCommit.Commit(
                 new GithubCommit.Commit.Author("SlideHehe", offsetDateTime),
@@ -164,10 +182,27 @@ public class GithubClientTest {
                 .withStatus(418)
                 .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
                 .withBody("{}")));
-        GithubClient githubClient = ClientFactory.createGithubclient(applicationConfig);
+        GithubClient githubClient = clientFactory.createGithubclient();
 
         // when-then
         assertThatThrownBy(() -> githubClient.getRepository("SlideHehe", "java-backend-course-2"))
             .isInstanceOf(WebClientException.class);
+    }
+
+    @Test
+    @DisplayName("Проверка retry политики")
+    void clientRetry() {
+        // given
+        stubFor(get(urlPathEqualTo("/repos/SlideHehe/java-backend-course-2"))
+            .willReturn(aResponse()
+                .withStatus(500)
+                .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+                .withBody("{}")));
+        GithubClient githubClient = clientFactory.createGithubclient();
+
+        // when-then
+        assertThatThrownBy(() -> githubClient.getRepository("SlideHehe", "java-backend-course-2"))
+            .isInstanceOf(WebClientException.class);
+        WireMock.verify(4, getRequestedFor(urlPathEqualTo("/repos/SlideHehe/java-backend-course-2")));
     }
 }

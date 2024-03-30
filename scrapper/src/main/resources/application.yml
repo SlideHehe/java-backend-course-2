@@ -1,13 +1,30 @@
 app:
+  database-access-type: jpa
   scheduler:
     enable: true
     interval: 30s
     force-check-delay: 1000s
-  client:
-    github-api-url: https://api.github.com  # для создание клиента с указанием base URL, пустое поле - используется base URL по умолчанию
-    stackoverflow-api-url: https://api.stackexchange.com/2.3
-    bot-api-url: http://localhost:8090
-  database-access-type: jpa
+  github-client:
+    base-url: https://api.github.com
+    retry:
+      backoff-policy: exponential
+      max-attempts: 3
+      initial-backoff: 10s
+      retryable-codes: 429, 500, 503
+  stackoverflow-client:
+    base-url: https://api.stackexchange.com/2.3
+    retry:
+      backoff-policy: exponential
+      max-attempts: 3
+      initial-backoff: 10s
+      retryable-codes: 429, 500, 503
+  bot-client:
+    base-url: http://localhost:8090
+    retry:
+      backoff-policy: exponential
+      max-attempts: 3
+      initial-backoff: 10s
+      retryable-codes: 429, 500, 503
 
 spring:
   application:
