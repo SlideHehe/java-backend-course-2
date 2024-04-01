@@ -1,14 +1,18 @@
 package edu.java.bot.client.scrapper;
 
+import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import edu.java.bot.client.ClientFactory;
+import edu.java.bot.client.exchangefilterfunction.LinearRetryFilter;
 import edu.java.bot.client.scrapper.dto.AddLinkRequest;
 import edu.java.bot.client.scrapper.dto.LinkResponse;
 import edu.java.bot.client.scrapper.dto.ListLinkResponse;
 import edu.java.bot.client.scrapper.dto.RemoveLinkRequest;
 import edu.java.bot.configuration.ApplicationConfig;
 import java.net.URI;
+import java.time.Duration;
 import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,6 +23,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClientException;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.delete;
+import static com.github.tomakehurst.wiremock.client.WireMock.deleteRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
@@ -32,17 +37,28 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @WireMockTest(httpPort = 8080)
-public class ScrapperClientTest {
+class ScrapperClientTest {
     @Mock
     ApplicationConfig applicationConfig;
 
     @Mock
     ApplicationConfig.Client client;
+    @Mock
+    ApplicationConfig.Client.Retry retry;
+    ClientFactory clientFactory;
 
     @BeforeEach
     void setupConfig() {
-        when(client.scrapperApiUrl()).thenReturn("http://localhost:8080");
-        when(applicationConfig.client()).thenReturn(client);
+        when(retry.maxAttempts()).thenReturn(3);
+        when(retry.initialBackoff()).thenReturn(Duration.ofSeconds(1));
+        when(retry.retryableCodes()).thenReturn(Set.of(500));
+        when(client.retry()).thenReturn(retry);
+        when(client.baseUrl()).thenReturn("http://localhost:8080");
+        when(applicationConfig.scrapperClient()).thenReturn(client);
+        clientFactory = new ClientFactory(
+            applicationConfig,
+            new LinearRetryFilter(client)
+        );
     }
 
     @Test
@@ -52,7 +68,7 @@ public class ScrapperClientTest {
         stubFor(post(urlPathEqualTo("/tg-chat/1"))
             .willReturn(aResponse()
                 .withStatus(200)));
-        ScrapperClient scrapperClient = ClientFactory.createScrapperClient(applicationConfig);
+        ScrapperClient scrapperClient = clientFactory.createScrapperClient();
 
         // when-then
         assertThatNoException().isThrownBy(() -> scrapperClient.registerChat(1L));
@@ -65,7 +81,7 @@ public class ScrapperClientTest {
         stubFor(delete(urlPathEqualTo("/tg-chat/1"))
             .willReturn(aResponse()
                 .withStatus(200)));
-        ScrapperClient scrapperClient = ClientFactory.createScrapperClient(applicationConfig);
+        ScrapperClient scrapperClient = clientFactory.createScrapperClient();
 
         // when-then
         assertThatNoException().isThrownBy(() -> scrapperClient.deleteChat(1L));
@@ -102,7 +118,7 @@ public class ScrapperClientTest {
             ),
             2
         );
-        ScrapperClient scrapperClient = ClientFactory.createScrapperClient(applicationConfig);
+        ScrapperClient scrapperClient = clientFactory.createScrapperClient();
 
         // when
         ListLinkResponse actualList = scrapperClient.getFollowedLinks(1L);
@@ -134,7 +150,7 @@ public class ScrapperClientTest {
                     """)));
         AddLinkRequest request = new AddLinkRequest(URI.create("https://aboba.com"));
         LinkResponse expectedResponse = new LinkResponse(1L, URI.create("https://aboba.com"));
-        ScrapperClient scrapperClient = ClientFactory.createScrapperClient(applicationConfig);
+        ScrapperClient scrapperClient = clientFactory.createScrapperClient();
 
         // when
         LinkResponse actualResponse = scrapperClient.addLink(1L, request);
@@ -166,7 +182,7 @@ public class ScrapperClientTest {
                     """)));
         RemoveLinkRequest request = new RemoveLinkRequest(URI.create("https://aboba.com"));
         LinkResponse expectedResponse = new LinkResponse(1L, URI.create("https://aboba.com"));
-        ScrapperClient scrapperClient = ClientFactory.createScrapperClient(applicationConfig);
+        ScrapperClient scrapperClient = clientFactory.createScrapperClient();
 
         // when
         LinkResponse actualResponse = scrapperClient.removeLink(1L, request);
@@ -182,9 +198,23 @@ public class ScrapperClientTest {
         stubFor(delete(urlPathEqualTo("/tg-chat/1"))
             .willReturn(aResponse()
                 .withStatus(400)));
-        ScrapperClient scrapperClient = ClientFactory.createScrapperClient(applicationConfig);
+        ScrapperClient scrapperClient = clientFactory.createScrapperClient();
 
         // when-then
         assertThatThrownBy(() -> scrapperClient.deleteChat(1L)).isInstanceOf(WebClientException.class);
+    }
+
+    @Test
+    @DisplayName("Проверка retry политики")
+    void clientRetry() {
+        // given
+        stubFor(delete(urlPathEqualTo("/tg-chat/1"))
+            .willReturn(aResponse()
+                .withStatus(500)));
+        ScrapperClient scrapperClient = clientFactory.createScrapperClient();
+
+        // when-then
+        assertThatThrownBy(() -> scrapperClient.deleteChat(1L)).isInstanceOf(WebClientException.class);
+        WireMock.verify(4, deleteRequestedFor(urlPathEqualTo("/tg-chat/1")));
     }
 }

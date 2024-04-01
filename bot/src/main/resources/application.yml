@@ -1,13 +1,23 @@
 app:
   telegram-token: ${BOT_TOKEN}
-  client:
-    scrapper-api-url: http://localhost:8080
+  scrapper-client:
+    base-url: http://localhost:8080
+    retry:
+      backoff-policy: exponential
+      max-attempts: 3
+      initial-backoff: 10s
+      retryable-codes: 429, 500, 503
 
 spring:
   application:
     name: bot
   jackson:
     time-zone: UTC
+  cache:
+    cache-names:
+      - rate-limit-buckets
+    caffeine:
+      spec: maximumSize=100000,expireAfterAccess=3600s
 
 server:
   port: 8090
@@ -18,3 +28,16 @@ logging:
 springdoc:
   swagger-ui:
     path: /swagger-ui
+
+bucket4j:
+  enabled: true
+  filters:
+    - cache-name: rate-limit-buckets
+      url: .*
+      http-response-body: "{ \"status\": 429, \"error\": \"Too Many Requests\", \"message\": \"You have exhausted your API Request limit\" }"
+      rate-limits:
+        - cache-key: "getRemoteAddr()"
+          bandwidths:
+            - capacity: 100
+              time: 1
+              unit: hours

@@ -4,52 +4,56 @@ import edu.java.scrapper.client.bot.BotClient;
 import edu.java.scrapper.client.github.GithubClient;
 import edu.java.scrapper.client.stackoverflow.StackoverflowClient;
 import edu.java.scrapper.configuration.ApplicationConfig;
-import org.jetbrains.annotations.NotNull;
+import java.util.Objects;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.support.WebClientAdapter;
 import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 
+@Component
+@RequiredArgsConstructor
 public class ClientFactory {
     private static final String STACKOVERFLOW_BASE_URL = "https://api.stackexchange.com/2.3";
     private static final String GITHUB_BASE_URL = "https://api.github.com";
     private static final String BOT_BASE_URL = "http://localhost:8090";
+    private final ApplicationConfig applicationConfig;
+    private final ExchangeFilterFunction stackoverflowRetryFilter;
+    private final ExchangeFilterFunction githubRetryFilter;
+    private final ExchangeFilterFunction botRetryFilter;
 
-    private ClientFactory() {
-    }
-
-    public static StackoverflowClient createStackoverflowClient(@NotNull ApplicationConfig applicationConfig) {
-        String baseUrl = STACKOVERFLOW_BASE_URL;
-
-        if (applicationConfig.client() != null && applicationConfig.client().stackoverflowApiUrl() != null) {
-            baseUrl = applicationConfig.client().stackoverflowApiUrl();
-        }
-        return getFactory(baseUrl).createClient(StackoverflowClient.class);
-    }
-
-    public static GithubClient createGithubclient(@NotNull ApplicationConfig applicationConfig) {
-        String baseUrl = GITHUB_BASE_URL;
-
-        if (applicationConfig.client() != null && applicationConfig.client().githubApiUrl() != null) {
-            baseUrl = applicationConfig.client().githubApiUrl();
-        }
-        return getFactory(baseUrl).createClient(GithubClient.class);
-    }
-
-    public static BotClient createBotClient(@NotNull ApplicationConfig applicationConfig) {
-        String baseUrl = BOT_BASE_URL;
-
-        if (applicationConfig.client() != null && applicationConfig.client().botApiUrl() != null) {
-            baseUrl = applicationConfig.client().botApiUrl();
-        }
-        return getFactory(baseUrl).createClient(BotClient.class);
-    }
-
-    private static HttpServiceProxyFactory getFactory(String baseUrl) {
+    public StackoverflowClient createStackoverflowClient() {
+        String baseUrl =
+            Objects.requireNonNullElse(applicationConfig.stackoverflowClient().baseUrl(), STACKOVERFLOW_BASE_URL);
         WebClient webClient = WebClient.builder()
             .baseUrl(baseUrl)
+            .filter(stackoverflowRetryFilter)
             .build();
-
         WebClientAdapter adapter = WebClientAdapter.create(webClient);
-        return HttpServiceProxyFactory.builderFor(adapter).build();
+        HttpServiceProxyFactory factory = HttpServiceProxyFactory.builderFor(adapter).build();
+        return factory.createClient(StackoverflowClient.class);
+    }
+
+    public GithubClient createGithubclient() {
+        String baseUrl = Objects.requireNonNullElse(applicationConfig.githubClient().baseUrl(), GITHUB_BASE_URL);
+        WebClient webClient = WebClient.builder()
+            .baseUrl(baseUrl)
+            .filter(githubRetryFilter)
+            .build();
+        WebClientAdapter adapter = WebClientAdapter.create(webClient);
+        HttpServiceProxyFactory factory = HttpServiceProxyFactory.builderFor(adapter).build();
+        return factory.createClient(GithubClient.class);
+    }
+
+    public BotClient createBotClient() {
+        String baseUrl = Objects.requireNonNullElse(applicationConfig.botClient().baseUrl(), BOT_BASE_URL);
+        WebClient webClient = WebClient.builder()
+            .baseUrl(baseUrl)
+            .filter(botRetryFilter)
+            .build();
+        WebClientAdapter adapter = WebClientAdapter.create(webClient);
+        HttpServiceProxyFactory factory = HttpServiceProxyFactory.builderFor(adapter).build();
+        return factory.createClient(BotClient.class);
     }
 }
