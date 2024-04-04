@@ -25,6 +25,18 @@ app:
       max-attempts: 3
       initial-backoff: 10s
       retryable-codes: 429, 500, 503
+  use-queue: true
+  kafka:
+    updates-topic:
+      name: updates
+      partitions: 1
+      replicas: 1
+    producer-properties:
+      bootstrap-servers: localhost:9092
+      acks-mode: all
+      delivery-timeout: 60s
+      linger-ms: 12_000
+      batch-size: 1024
 
 spring:
   application:
