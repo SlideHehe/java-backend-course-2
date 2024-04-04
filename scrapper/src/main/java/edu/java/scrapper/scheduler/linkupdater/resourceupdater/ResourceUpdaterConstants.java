@@ -1,4 +1,4 @@
-package edu.java.scrapper.scheduler.resourceupdater;
+package edu.java.scrapper.scheduler.linkupdater.resourceupdater;
 
 public class ResourceUpdaterConstants {
     public static final String GITHUB_HOST = "github.com";

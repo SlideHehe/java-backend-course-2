@@ -1,6 +1,5 @@
 package edu.java.scrapper.configuration.database;
 
-import edu.java.scrapper.client.bot.BotClient;
 import edu.java.scrapper.configuration.ApplicationConfig;
 import edu.java.scrapper.domain.chatlink.schemabased.jooq.JooqChatLinkDao;
 import edu.java.scrapper.domain.links.LinkService;
@@ -9,9 +8,10 @@ import edu.java.scrapper.domain.links.schemabased.jooq.JooqSchemaBasedLinkServic
 import edu.java.scrapper.domain.tgchat.TgChatService;
 import edu.java.scrapper.domain.tgchat.schemabased.jooq.JooqSchemaBasedTgChatService;
 import edu.java.scrapper.domain.tgchat.schemabased.jooq.JooqTgChatDao;
-import edu.java.scrapper.scheduler.LinkUpdater;
-import edu.java.scrapper.scheduler.resourceupdater.ResourceUpdater;
-import edu.java.scrapper.scheduler.schemabased.jooq.JooqSchemaBasedLinkUpdater;
+import edu.java.scrapper.scheduler.linkupdater.LinkUpdater;
+import edu.java.scrapper.scheduler.linkupdater.resourceupdater.ResourceUpdater;
+import edu.java.scrapper.scheduler.linkupdater.schemabased.jooq.JooqSchemaBasedLinkUpdater;
+import edu.java.scrapper.scheduler.updatesender.UpdateSender;
 import java.util.List;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -40,14 +40,14 @@ public class JooqAccessConfiguration {
     public LinkUpdater linkUpdater(
         JooqTgChatDao jooqTgChatDao,
         JooqLinkDao jooqLinkDao,
-        BotClient botClient,
+        UpdateSender updateSender,
         ApplicationConfig applicationConfig,
         List<ResourceUpdater> resourceUpdaters
     ) {
         return new JooqSchemaBasedLinkUpdater(
             jooqTgChatDao,
             jooqLinkDao,
-            botClient,
+            updateSender,
             applicationConfig,
             resourceUpdaters
         );

@@ -1,7 +1,7 @@
-package edu.java.scrapper.scheduler.resourceupdater;
+package edu.java.scrapper.scheduler.linkupdater.resourceupdater;
 
 import edu.java.scrapper.domain.links.schemabased.Link;
-import edu.java.scrapper.scheduler.UpdateInfo;
+import edu.java.scrapper.scheduler.linkupdater.UpdateInfo;
 import java.util.Optional;
 
 public interface ResourceUpdater {

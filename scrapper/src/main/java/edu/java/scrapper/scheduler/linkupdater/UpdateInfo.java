@@ -1,4 +1,4 @@
-package edu.java.scrapper.scheduler;
+package edu.java.scrapper.scheduler.linkupdater;
 
 import edu.java.scrapper.domain.links.schemabased.Link;
 

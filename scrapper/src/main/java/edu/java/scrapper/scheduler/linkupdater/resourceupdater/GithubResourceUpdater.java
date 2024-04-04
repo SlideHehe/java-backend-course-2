@@ -1,4 +1,4 @@
-package edu.java.scrapper.scheduler.resourceupdater;
+package edu.java.scrapper.scheduler.linkupdater.resourceupdater;
 
 import edu.java.scrapper.client.github.GithubClient;
 import edu.java.scrapper.client.github.dto.GithubCommit;
@@ -6,7 +6,7 @@ import edu.java.scrapper.client.github.dto.GithubPullRequest;
 import edu.java.scrapper.client.github.dto.GithubRepository;
 import edu.java.scrapper.domain.links.Type;
 import edu.java.scrapper.domain.links.schemabased.Link;
-import edu.java.scrapper.scheduler.UpdateInfo;
+import edu.java.scrapper.scheduler.linkupdater.UpdateInfo;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;

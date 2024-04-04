@@ -33,7 +33,7 @@ public class KafkaConfiguration {
         Map<String, Object> props = new HashMap<>();
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, producerProperties.bootstrapServers());
         props.put(ProducerConfig.ACKS_CONFIG, producerProperties.acksMode());
-        props.put(ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG, producerProperties.deliveryTimeout().toMillis());
+        props.put(ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG, (int) producerProperties.deliveryTimeout().toMillis());
         props.put(ProducerConfig.LINGER_MS_CONFIG, producerProperties.lingerMs());
         props.put(ProducerConfig.BATCH_SIZE_CONFIG, producerProperties.batchSize());
         props.put(JsonSerializer.ADD_TYPE_INFO_HEADERS, false);

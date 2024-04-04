@@ -1,4 +1,4 @@
-package edu.java.scrapper.scheduler.resourceupdater;
+package edu.java.scrapper.scheduler.linkupdater.resourceupdater;
 
 import edu.java.scrapper.domain.links.schemabased.Link;
 import edu.java.scrapper.domain.links.Type;
@@ -6,11 +6,12 @@ import edu.java.scrapper.client.stackoverflow.StackoverflowClient;
 import edu.java.scrapper.client.stackoverflow.dto.StackoverflowAnswers;
 import edu.java.scrapper.client.stackoverflow.dto.StackoverflowComments;
 import edu.java.scrapper.client.stackoverflow.dto.StackoverflowQuestion;
-import edu.java.scrapper.scheduler.UpdateInfo;
+import edu.java.scrapper.scheduler.linkupdater.UpdateInfo;
 import java.net.URI;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

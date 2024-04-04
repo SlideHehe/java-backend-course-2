@@ -1,4 +1,4 @@
-package edu.java.scrapper.scheduler.resourceupdater;
+package edu.java.scrapper.scheduler.linkupdater.resourceupdater;
 
 import edu.java.scrapper.domain.links.schemabased.Link;
 import edu.java.scrapper.domain.links.Type;
@@ -6,11 +6,12 @@ import edu.java.scrapper.client.github.GithubClient;
 import edu.java.scrapper.client.github.dto.GithubCommit;
 import edu.java.scrapper.client.github.dto.GithubPullRequest;
 import edu.java.scrapper.client.github.dto.GithubRepository;
-import edu.java.scrapper.scheduler.UpdateInfo;
+import edu.java.scrapper.scheduler.linkupdater.UpdateInfo;
 import java.net.URI;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -92,8 +93,8 @@ class GithubResourceUpdaterTest {
         Optional<UpdateInfo> expectedUpdateInfo =
             Optional.of(new UpdateInfo(
                 new Link(1L, uri, time.minusMinutes(5), time.minusMinutes(10), Type.GITHUB, null, null, 1, 0),
-                ResourceUpdaterConstants.GITHUB_UPDATE_RESPONSE.formatted("java-backend-course-2")
-                + ResourceUpdaterConstants.GITHUB_NEW_PULL_REQUEST.formatted("hello")
+                    ResourceUpdaterConstants.GITHUB_UPDATE_RESPONSE.formatted("java-backend-course-2")
+                    + ResourceUpdaterConstants.GITHUB_NEW_PULL_REQUEST.formatted("hello")
             ));
 
         // when

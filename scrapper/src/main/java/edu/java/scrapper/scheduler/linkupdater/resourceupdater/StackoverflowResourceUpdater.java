@@ -1,4 +1,4 @@
-package edu.java.scrapper.scheduler.resourceupdater;
+package edu.java.scrapper.scheduler.linkupdater.resourceupdater;
 
 import edu.java.scrapper.client.stackoverflow.StackoverflowClient;
 import edu.java.scrapper.client.stackoverflow.dto.StackoverflowAnswers;
@@ -6,7 +6,7 @@ import edu.java.scrapper.client.stackoverflow.dto.StackoverflowComments;
 import edu.java.scrapper.client.stackoverflow.dto.StackoverflowQuestion;
 import edu.java.scrapper.domain.links.Type;
 import edu.java.scrapper.domain.links.schemabased.Link;
-import edu.java.scrapper.scheduler.UpdateInfo;
+import edu.java.scrapper.scheduler.linkupdater.UpdateInfo;
 import java.time.OffsetDateTime;
 import java.util.Optional;
 import java.util.regex.Pattern;

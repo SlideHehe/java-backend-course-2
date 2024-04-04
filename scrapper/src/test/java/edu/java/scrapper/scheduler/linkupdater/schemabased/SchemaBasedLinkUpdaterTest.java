@@ -1,12 +1,12 @@
-package edu.java.scrapper.scheduler.schemabased;
+package edu.java.scrapper.scheduler.linkupdater.schemabased;
 
-import edu.java.scrapper.client.bot.BotClient;
 import edu.java.scrapper.configuration.ApplicationConfig;
+import edu.java.scrapper.domain.links.Type;
 import edu.java.scrapper.domain.links.schemabased.Link;
 import edu.java.scrapper.domain.links.schemabased.LinkDao;
-import edu.java.scrapper.domain.links.Type;
 import edu.java.scrapper.domain.tgchat.schemabased.TgChatDao;
-import edu.java.scrapper.scheduler.resourceupdater.GithubResourceUpdater;
+import edu.java.scrapper.scheduler.linkupdater.resourceupdater.GithubResourceUpdater;
+import edu.java.scrapper.scheduler.updatesender.UpdateSender;
 import java.net.URI;
 import java.time.Duration;
 import java.time.OffsetDateTime;
@@ -28,7 +28,7 @@ class SchemaBasedLinkUpdaterTest {
     @Mock
     LinkDao linkDao;
     @Mock
-    BotClient botClient;
+    UpdateSender updateSender;
     @Mock
     ApplicationConfig applicationConfig;
     @Mock
@@ -62,7 +62,7 @@ class SchemaBasedLinkUpdaterTest {
         SchemaBasedLinkUpdater linkUpdater = new SchemaBasedLinkUpdater(
             tgChatDao,
             linkDao,
-            botClient,
+            updateSender,
             applicationConfig,
             List.of(githubResourceUpdater)
         );

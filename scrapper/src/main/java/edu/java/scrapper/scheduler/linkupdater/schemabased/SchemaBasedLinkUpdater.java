@@ -1,27 +1,26 @@
-package edu.java.scrapper.scheduler.schemabased;
+package edu.java.scrapper.scheduler.linkupdater.schemabased;
 
-import edu.java.scrapper.client.bot.BotClient;
 import edu.java.scrapper.client.bot.dto.LinkUpdateRequest;
 import edu.java.scrapper.configuration.ApplicationConfig;
 import edu.java.scrapper.domain.links.schemabased.Link;
 import edu.java.scrapper.domain.links.schemabased.LinkDao;
 import edu.java.scrapper.domain.tgchat.schemabased.TgChat;
 import edu.java.scrapper.domain.tgchat.schemabased.TgChatDao;
-import edu.java.scrapper.scheduler.LinkUpdater;
-import edu.java.scrapper.scheduler.UpdateInfo;
-import edu.java.scrapper.scheduler.resourceupdater.ResourceUpdater;
+import edu.java.scrapper.scheduler.linkupdater.LinkUpdater;
+import edu.java.scrapper.scheduler.linkupdater.UpdateInfo;
+import edu.java.scrapper.scheduler.linkupdater.resourceupdater.ResourceUpdater;
+import edu.java.scrapper.scheduler.updatesender.UpdateSender;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.reactive.function.client.WebClientException;
 
 @Slf4j
 @RequiredArgsConstructor
 public class SchemaBasedLinkUpdater implements LinkUpdater {
     private final TgChatDao tgChatDao;
     private final LinkDao linkDao;
-    private final BotClient botClient;
+    private final UpdateSender updateSender;
     private final ApplicationConfig applicationConfig;
     private final List<ResourceUpdater> resourceUpdaters;
 
@@ -66,12 +65,7 @@ public class SchemaBasedLinkUpdater implements LinkUpdater {
 
         LinkUpdateRequest linkUpdateRequest =
             new LinkUpdateRequest(updateInfo.link().url(), updateInfo.description(), chatIds);
-
-        try {
-            botClient.createUpdate(linkUpdateRequest);
-        } catch (WebClientException e) {
-            log.error(e.getMessage());
-        }
+        updateSender.send(linkUpdateRequest);
     }
 
 }
