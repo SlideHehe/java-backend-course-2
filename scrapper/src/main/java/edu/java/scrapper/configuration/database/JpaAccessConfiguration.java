@@ -10,7 +10,7 @@ import edu.java.scrapper.domain.tgchat.jpa.JpaTgChatService;
 import edu.java.scrapper.scheduler.linkupdater.LinkUpdater;
 import edu.java.scrapper.scheduler.linkupdater.jpa.JpaLinkUpdater;
 import edu.java.scrapper.scheduler.linkupdater.resourceupdater.ResourceUpdater;
-import edu.java.scrapper.scheduler.updatesender.UpdateSender;
+import edu.java.scrapper.scheduler.updateproducer.UpdateProducer;
 import java.util.List;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -39,14 +39,14 @@ public class JpaAccessConfiguration {
     LinkUpdater linkUpdater(
         JpaLinkRepository jpaLinkRepository,
         JpaChatRepository jpaChatRepository,
-        UpdateSender updateSender,
+        UpdateProducer updateProducer,
         ApplicationConfig applicationConfig,
         List<ResourceUpdater> resourceUpdaters
     ) {
         return new JpaLinkUpdater(
             jpaLinkRepository,
             jpaChatRepository,
-            updateSender,
+                updateProducer,
             applicationConfig,
             resourceUpdaters
         );

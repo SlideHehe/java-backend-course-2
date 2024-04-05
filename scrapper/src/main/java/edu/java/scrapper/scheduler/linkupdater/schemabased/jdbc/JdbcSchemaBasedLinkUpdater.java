@@ -5,17 +5,17 @@ import edu.java.scrapper.domain.links.schemabased.jdbc.JdbcLinkDao;
 import edu.java.scrapper.domain.tgchat.schemabased.jdbc.JdbcTgChatDao;
 import edu.java.scrapper.scheduler.linkupdater.resourceupdater.ResourceUpdater;
 import edu.java.scrapper.scheduler.linkupdater.schemabased.SchemaBasedLinkUpdater;
-import edu.java.scrapper.scheduler.updatesender.UpdateSender;
+import edu.java.scrapper.scheduler.updateproducer.UpdateProducer;
 import java.util.List;
 
 public class JdbcSchemaBasedLinkUpdater extends SchemaBasedLinkUpdater {
     public JdbcSchemaBasedLinkUpdater(
         JdbcTgChatDao jdbcTgChatDao,
         JdbcLinkDao jdbcLinkDao,
-        UpdateSender updateSender,
+        UpdateProducer updateProducer,
         ApplicationConfig applicationConfig,
         List<ResourceUpdater> resourceUpdaters
     ) {
-        super(jdbcTgChatDao, jdbcLinkDao, updateSender, applicationConfig, resourceUpdaters);
+        super(jdbcTgChatDao, jdbcLinkDao, updateProducer, applicationConfig, resourceUpdaters);
     }
 }

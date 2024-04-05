@@ -12,7 +12,7 @@ import edu.java.scrapper.scheduler.linkupdater.LinkUpdater;
 import edu.java.scrapper.scheduler.linkupdater.resourceupdater.ResourceUpdater;
 import edu.java.scrapper.scheduler.linkupdater.schemabased.jdbc.JdbcSchemaBasedLinkUpdater;
 import java.util.List;
-import edu.java.scrapper.scheduler.updatesender.UpdateSender;
+import edu.java.scrapper.scheduler.updateproducer.UpdateProducer;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -40,14 +40,14 @@ public class JdbcAccessConfiguration {
     public LinkUpdater linkUpdater(
         JdbcTgChatDao jdbcTgChatDao,
         JdbcLinkDao jdbcLinkDao,
-        UpdateSender updateSender,
+        UpdateProducer updateProducer,
         ApplicationConfig applicationConfig,
         List<ResourceUpdater> resourceUpdaters
     ) {
         return new JdbcSchemaBasedLinkUpdater(
             jdbcTgChatDao,
             jdbcLinkDao,
-            updateSender,
+                updateProducer,
             applicationConfig,
             resourceUpdaters
         );

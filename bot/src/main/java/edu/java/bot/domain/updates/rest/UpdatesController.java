@@ -1,5 +1,6 @@
-package edu.java.bot.domain.updates;
+package edu.java.bot.domain.updates.rest;
 
+import edu.java.bot.domain.updates.UpdatesService;
 import edu.java.bot.domain.updates.dto.LinkUpdateRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

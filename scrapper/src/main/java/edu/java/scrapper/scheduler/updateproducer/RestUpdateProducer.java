@@ -1,4 +1,4 @@
-package edu.java.scrapper.scheduler.updatesender;
+package edu.java.scrapper.scheduler.updateproducer;
 
 import edu.java.scrapper.client.bot.BotClient;
 import edu.java.scrapper.client.bot.dto.LinkUpdateRequest;
@@ -8,7 +8,7 @@ import org.springframework.web.reactive.function.client.WebClientException;
 
 @Slf4j
 @RequiredArgsConstructor
-public class HttpUpdateSender implements UpdateSender {
+public class RestUpdateProducer implements UpdateProducer {
     private final BotClient botClient;
 
     @Override

@@ -6,7 +6,7 @@ import edu.java.scrapper.domain.links.jpa.JpaLinkRepository;
 import edu.java.scrapper.domain.links.jpa.Link;
 import edu.java.scrapper.domain.tgchat.jpa.JpaChatRepository;
 import edu.java.scrapper.scheduler.linkupdater.resourceupdater.GithubResourceUpdater;
-import edu.java.scrapper.scheduler.updatesender.UpdateSender;
+import edu.java.scrapper.scheduler.updateproducer.UpdateProducer;
 import java.time.Duration;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -26,7 +26,7 @@ class JpaLinkUpdaterTest {
     @Mock
     JpaLinkRepository linkRepository;
     @Mock
-    UpdateSender updateSender;
+    UpdateProducer updateProducer;
     @Mock
     ApplicationConfig applicationConfig;
     @Mock
@@ -50,7 +50,7 @@ class JpaLinkUpdaterTest {
         JpaLinkUpdater linkUpdater = new JpaLinkUpdater(
             linkRepository,
             chatRepository,
-            updateSender,
+                updateProducer,
             applicationConfig,
             List.of(githubResourceUpdater)
         );

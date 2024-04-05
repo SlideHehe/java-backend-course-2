@@ -6,7 +6,7 @@ import edu.java.scrapper.domain.links.schemabased.Link;
 import edu.java.scrapper.domain.links.schemabased.LinkDao;
 import edu.java.scrapper.domain.tgchat.schemabased.TgChatDao;
 import edu.java.scrapper.scheduler.linkupdater.resourceupdater.GithubResourceUpdater;
-import edu.java.scrapper.scheduler.updatesender.UpdateSender;
+import edu.java.scrapper.scheduler.updateproducer.UpdateProducer;
 import java.net.URI;
 import java.time.Duration;
 import java.time.OffsetDateTime;
@@ -28,7 +28,7 @@ class SchemaBasedLinkUpdaterTest {
     @Mock
     LinkDao linkDao;
     @Mock
-    UpdateSender updateSender;
+    UpdateProducer updateProducer;
     @Mock
     ApplicationConfig applicationConfig;
     @Mock
@@ -62,7 +62,7 @@ class SchemaBasedLinkUpdaterTest {
         SchemaBasedLinkUpdater linkUpdater = new SchemaBasedLinkUpdater(
             tgChatDao,
             linkDao,
-            updateSender,
+                updateProducer,
             applicationConfig,
             List.of(githubResourceUpdater)
         );

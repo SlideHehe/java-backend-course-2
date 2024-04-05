@@ -9,7 +9,7 @@ import edu.java.scrapper.domain.tgchat.schemabased.TgChatDao;
 import edu.java.scrapper.scheduler.linkupdater.LinkUpdater;
 import edu.java.scrapper.scheduler.linkupdater.UpdateInfo;
 import edu.java.scrapper.scheduler.linkupdater.resourceupdater.ResourceUpdater;
-import edu.java.scrapper.scheduler.updatesender.UpdateSender;
+import edu.java.scrapper.scheduler.updateproducer.UpdateProducer;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class SchemaBasedLinkUpdater implements LinkUpdater {
     private final TgChatDao tgChatDao;
     private final LinkDao linkDao;
-    private final UpdateSender updateSender;
+    private final UpdateProducer updateProducer;
     private final ApplicationConfig applicationConfig;
     private final List<ResourceUpdater> resourceUpdaters;
 
@@ -65,7 +65,7 @@ public class SchemaBasedLinkUpdater implements LinkUpdater {
 
         LinkUpdateRequest linkUpdateRequest =
             new LinkUpdateRequest(updateInfo.link().url(), updateInfo.description(), chatIds);
-        updateSender.send(linkUpdateRequest);
+        updateProducer.send(linkUpdateRequest);
     }
 
 }

@@ -1,10 +1,10 @@
-package edu.java.scrapper.scheduler.updatesender;
+package edu.java.scrapper.scheduler.updateproducer;
 
 import edu.java.scrapper.client.bot.dto.LinkUpdateRequest;
 import edu.java.scrapper.configuration.ApplicationConfig;
 import org.springframework.kafka.core.KafkaTemplate;
 
-public class ScrapperQueueProducer implements UpdateSender {
+public class ScrapperQueueProducer implements UpdateProducer {
     private final KafkaTemplate<String, LinkUpdateRequest> updateRequestKafkaTemplate;
     private final String updatesTopicName;
 
