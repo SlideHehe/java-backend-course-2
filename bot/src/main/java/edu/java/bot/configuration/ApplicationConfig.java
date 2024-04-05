@@ -38,7 +38,6 @@ public record ApplicationConfig(
             @NotNull String groupId,
             @NotNull String autoOffsetReset,
             @NotNull Integer maxPollIntervalMs,
-            @NotNull Boolean enableAutoCommit,
             @NotNull Integer concurrency
         ) {
         }

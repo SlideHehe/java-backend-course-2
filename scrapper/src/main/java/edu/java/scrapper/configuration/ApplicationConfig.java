@@ -1,9 +1,10 @@
 package edu.java.scrapper.configuration;
 
-import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.AssertFalse;
 import jakarta.validation.constraints.NotNull;
 import java.time.Duration;
 import java.util.Set;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.validation.annotation.Validated;
@@ -17,6 +18,7 @@ public record ApplicationConfig(
     @NotNull Client stackoverflowClient,
     @NotNull Client botClient,
     @NotNull Boolean useQueue,
+    @ConditionalOnProperty
     Kafka kafka
 ) {
     public record Scheduler(boolean enable, @NotNull Duration interval, @NotNull Duration forceCheckDelay) {
@@ -58,11 +60,11 @@ public record ApplicationConfig(
     ) {
     }
 
-    @AssertTrue
-    private boolean kafkaIsNotRequired() {
+    @AssertFalse
+    public boolean isKafkaRequired() {
         if (useQueue) {
-            return kafka != null;
+            return kafka == null;
         }
-        return true;
+        return false;
     }
 }
