@@ -94,7 +94,7 @@ public class KafkaConfiguration {
 
     @Bean
     public DefaultErrorHandler errorHandler() {
-        return new DefaultErrorHandler((consumerRecord, exception) -> log.warn(
+        return new DefaultErrorHandler((consumerRecord, exception) -> log.error(
             "Unprocessable message: %s%n%s".formatted(consumerRecord.value(), exception.getMessage())
         ));
     }
