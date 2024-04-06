@@ -44,7 +44,9 @@ public class KafkaConfiguration {
     }
 
     @Bean
-    public ConsumerFactory<String, LinkUpdateRequest> updateRequestConsumerFactory(ApplicationConfig applicationConfig) {
+    public ConsumerFactory<String, LinkUpdateRequest> updateRequestConsumerFactory(
+        ApplicationConfig applicationConfig
+    ) {
         var consumerProperties = applicationConfig.kafka().consumerProperties();
         Map<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, consumerProperties.bootstrapServers());
@@ -85,7 +87,9 @@ public class KafkaConfiguration {
     }
 
     @Bean
-    public KafkaTemplate<String, LinkUpdateRequest> kafkaTemplate(ProducerFactory<String, LinkUpdateRequest> producerFactory) {
+    public KafkaTemplate<String, LinkUpdateRequest> kafkaTemplate(
+        ProducerFactory<String, LinkUpdateRequest> producerFactory
+    ) {
         return new KafkaTemplate<>(producerFactory);
     }
 }

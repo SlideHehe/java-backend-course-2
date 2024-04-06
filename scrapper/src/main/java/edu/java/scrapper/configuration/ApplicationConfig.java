@@ -21,6 +21,14 @@ public record ApplicationConfig(
     @ConditionalOnProperty
     Kafka kafka
 ) {
+    @AssertFalse
+    public boolean isKafkaRequired() {
+        if (useQueue) {
+            return kafka == null;
+        }
+        return false;
+    }
+
     public record Scheduler(boolean enable, @NotNull Duration interval, @NotNull Duration forceCheckDelay) {
     }
 
@@ -58,13 +66,5 @@ public record ApplicationConfig(
         @NotNull Integer partitions,
         @NotNull Integer replicas
     ) {
-    }
-
-    @AssertFalse
-    public boolean isKafkaRequired() {
-        if (useQueue) {
-            return kafka == null;
-        }
-        return false;
     }
 }

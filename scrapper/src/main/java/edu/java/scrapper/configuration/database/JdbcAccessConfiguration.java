@@ -11,8 +11,8 @@ import edu.java.scrapper.domain.tgchat.schemabased.jdbc.JdbcTgChatDao;
 import edu.java.scrapper.scheduler.linkupdater.LinkUpdater;
 import edu.java.scrapper.scheduler.linkupdater.resourceupdater.ResourceUpdater;
 import edu.java.scrapper.scheduler.linkupdater.schemabased.jdbc.JdbcSchemaBasedLinkUpdater;
-import java.util.List;
 import edu.java.scrapper.scheduler.updateproducer.UpdateProducer;
+import java.util.List;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -47,7 +47,7 @@ public class JdbcAccessConfiguration {
         return new JdbcSchemaBasedLinkUpdater(
             jdbcTgChatDao,
             jdbcLinkDao,
-                updateProducer,
+            updateProducer,
             applicationConfig,
             resourceUpdaters
         );
