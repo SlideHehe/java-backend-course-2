@@ -3,6 +3,7 @@ package edu.java.scrapper.configuration;
 import edu.java.scrapper.client.bot.dto.LinkUpdateRequest;
 import java.util.HashMap;
 import java.util.Map;
+import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
@@ -11,6 +12,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.TopicBuilder;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
+import org.springframework.kafka.core.KafkaAdmin;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.support.serializer.JsonSerializer;
@@ -18,6 +20,14 @@ import org.springframework.kafka.support.serializer.JsonSerializer;
 @Configuration
 @ConditionalOnProperty(name = "app.use-queue")
 public class KafkaConfiguration {
+    @Bean
+    public KafkaAdmin kafkaAdmin(ApplicationConfig applicationConfig) {
+        var producerProps = applicationConfig.kafka().producerProperties();
+        Map<String, Object> configs = new HashMap<>();
+        configs.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, producerProps.bootstrapServers());
+        return new KafkaAdmin(configs);
+    }
+
     @Bean
     public NewTopic updatesTopic(ApplicationConfig applicationConfig) {
         var updatesTopic = applicationConfig.kafka().updatesTopic();

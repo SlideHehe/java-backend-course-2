@@ -3,6 +3,7 @@ package edu.java.bot.configuration;
 import edu.java.bot.domain.updates.dto.LinkUpdateRequest;
 import java.util.HashMap;
 import java.util.Map;
+import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -16,6 +17,7 @@ import org.springframework.kafka.config.TopicBuilder;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
+import org.springframework.kafka.core.KafkaAdmin;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.listener.ContainerProperties;
@@ -25,6 +27,18 @@ import org.springframework.kafka.support.serializer.JsonSerializer;
 @EnableKafka
 @Configuration
 public class KafkaConfiguration {
+    @Bean
+    public KafkaAdmin kafkaAdmin(ApplicationConfig applicationConfig) {
+        var producerProps = applicationConfig.kafka().producerProperties();
+        var consumerProps = applicationConfig.kafka().consumerProperties();
+        Map<String, Object> configs = new HashMap<>();
+        configs.put(
+            AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG,
+            producerProps.bootstrapServers() + "," + consumerProps.bootstrapServers()
+        );
+        return new KafkaAdmin(configs);
+    }
+
     @Bean
     public NewTopic updatesTopic(ApplicationConfig applicationConfig) {
         var updatesTopic = applicationConfig.kafka().updatesTopic();

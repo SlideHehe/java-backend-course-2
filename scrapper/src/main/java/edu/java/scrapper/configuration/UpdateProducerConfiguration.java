@@ -23,7 +23,7 @@ public class UpdateProducerConfiguration {
 
     @Bean
     @ConditionalOnProperty(name = "app.use-queue", havingValue = "false")
-    UpdateProducer httpUpdateSender(BotClient botClient) {
+    UpdateProducer restUpdateSender(BotClient botClient) {
         return new RestUpdateProducer(botClient);
     }
 }
