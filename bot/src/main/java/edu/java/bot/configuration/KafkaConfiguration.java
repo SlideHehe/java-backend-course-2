@@ -3,6 +3,7 @@ package edu.java.bot.configuration;
 import edu.java.bot.domain.updates.dto.LinkUpdateRequest;
 import java.util.HashMap;
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -21,9 +22,11 @@ import org.springframework.kafka.core.KafkaAdmin;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.listener.ContainerProperties;
+import org.springframework.kafka.listener.DefaultErrorHandler;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 
+@Slf4j
 @EnableKafka
 @Configuration
 public class KafkaConfiguration {
@@ -76,14 +79,24 @@ public class KafkaConfiguration {
 
     @Bean
     public ConcurrentKafkaListenerContainerFactory<String, LinkUpdateRequest> updateRequestContainerFactory(
-        ConsumerFactory<String, LinkUpdateRequest> consumerFactory, ApplicationConfig applicationConfig
+        ConsumerFactory<String, LinkUpdateRequest> consumerFactory,
+        ApplicationConfig applicationConfig,
+        DefaultErrorHandler errorHandler
     ) {
         var consumerProperties = applicationConfig.kafka().consumerProperties();
         var factory = new ConcurrentKafkaListenerContainerFactory<String, LinkUpdateRequest>();
         factory.setConsumerFactory(consumerFactory);
         factory.setConcurrency(consumerProperties.concurrency());
         factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL);
+        factory.setCommonErrorHandler(errorHandler);
         return factory;
+    }
+
+    @Bean
+    public DefaultErrorHandler errorHandler() {
+        return new DefaultErrorHandler((consumerRecord, exception) -> log.warn(
+            "Unprocessable message: %s%n%s".formatted(consumerRecord.value(), exception.getMessage())
+        ));
     }
 
     @Bean
