@@ -62,3 +62,25 @@ bucket4j:
             - capacity: 100
               time: 1
               unit: hours
+
+management:
+  server:
+    port: 18090
+  endpoints:
+    enabled-by-default: false
+    web:
+      base-path: "/"
+      exposure:
+        include: "health,info,prometheus"
+      path-mapping:
+        prometheus: "metrics"
+  endpoint:
+    health:
+      enabled: true
+    info:
+      enabled: true
+    prometheus:
+      enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}
