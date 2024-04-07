@@ -71,11 +71,43 @@ services:
     networks:
       - backend
 
+  prometheus:
+    image: prom/prometheus:v2.51.1
+    container_name: prometheus
+    restart: unless-stopped
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    ports:
+      - "9090:9090"
+    networks:
+      - backend
+
+  grafana:
+    image: grafana/grafana-oss:10.4.1
+    container_name: grafana
+    depends_on:
+      - prometheus
+    volumes:
+      - grafana:/var/lib/grafana
+    ports:
+      - "3000:3000"
+    networks:
+      - backend
+
 volumes:
   postgresql: { }
   zookeeper-data: { }
   zookeeper-log: { }
   kafka-data: { }
+  prometheus: { }
+  grafana: { }
 
 networks:
   backend: { }
