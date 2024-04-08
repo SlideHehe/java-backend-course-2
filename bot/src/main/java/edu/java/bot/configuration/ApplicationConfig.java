@@ -12,7 +12,8 @@ import org.springframework.validation.annotation.Validated;
 public record ApplicationConfig(
     @NotEmpty String telegramToken,
     @NotNull Client scrapperClient,
-    @NotNull Kafka kafka
+    @NotNull Kafka kafka,
+    @NotNull Metrics metrics
 ) {
     public record Client(String baseUrl, @NotNull Retry retry) {
         public record Retry(
@@ -55,6 +56,16 @@ public record ApplicationConfig(
             @NotNull String name,
             @NotNull Integer partitions,
             @NotNull Integer replicas
+        ) {
+        }
+    }
+
+    public record Metrics(
+        @NotNull ProcessedMessagesCount processedMessagesCount
+    ) {
+        public record ProcessedMessagesCount(
+            @NotNull String name,
+            @NotNull String description
         ) {
         }
     }

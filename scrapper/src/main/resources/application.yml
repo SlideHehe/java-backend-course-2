@@ -25,7 +25,7 @@ app:
       max-attempts: 3
       initial-backoff: 10s
       retryable-codes: 429, 500, 503
-  use-queue: true
+  use-queue: false
   kafka:
     updates-topic:
       name: updates

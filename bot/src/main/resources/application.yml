@@ -28,6 +28,10 @@ app:
       name: updates_dlq
       partitions: 1
       replicas: 1
+  metrics:
+    processed-messages-count:
+      name: bot_processed_messages
+      description: "Number of messages received from scrapper via kafka or rest api"
 
 spring:
   application:
