@@ -7,6 +7,10 @@ on:
       - .github/workflows/scrapper.yml
       - scrapper/**
 
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: slidehehe/java-backend-course-2/scrapper
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -25,6 +29,19 @@ jobs:
 
       - name: maven build
         run: mvn -pl scrapper -am package
+
+      - name: docker build scrapper image
+        run: docker build -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }} -f ${{ github.workspace }}/scrapper/Dockerfile ${{ github.workspace }}/scrapper
+
+      - name: docker login to github registry
+        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: docker push scrapper image
+        run: docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
       - id: jacoco
         uses: madrapps/jacoco-report@v1.6.1

@@ -5,21 +5,21 @@ app:
     interval: 30s
     force-check-delay: 1000s
   github-client:
-    base-url: https://api.github.com
+    base-url: ${GITHUB_BASE_URL}
     retry:
       backoff-policy: exponential
       max-attempts: 3
       initial-backoff: 10s
       retryable-codes: 429, 500, 503
   stackoverflow-client:
-    base-url: https://api.stackexchange.com/2.3
+    base-url: ${STACKOVERFLOW_BASE_URL}
     retry:
       backoff-policy: exponential
       max-attempts: 3
       initial-backoff: 10s
       retryable-codes: 429, 500, 503
   bot-client:
-    base-url: http://localhost:8090
+    base-url: ${BOT_BASE_URL}
     retry:
       backoff-policy: exponential
       max-attempts: 3
@@ -32,7 +32,7 @@ app:
       partitions: 1
       replicas: 1
     producer-properties:
-      bootstrap-servers: localhost:9092
+      bootstrap-servers: ${KAFKA_PRODUCER_BOOTSTRAP_SERVERS}
       acks-mode: all
       delivery-timeout: 60s
       linger-ms: 12_000
@@ -42,7 +42,7 @@ spring:
   application:
     name: scrapper
   datasource:
-    url: jdbc:postgresql://localhost:5432/scrapper
+    url: jdbc:postgresql://${POSTGRES_SERVER}/scrapper
     username: postgres
     password: postgres
   cache:
