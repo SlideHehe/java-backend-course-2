@@ -8,7 +8,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 
-public class LiquibaseChangelogTest extends IntegrationTest {
+class LiquibaseChangelogTest extends IntegrationTest {
     @Test
     @DisplayName("Проверка создания таблиц из changelog-а")
     void checkTablesCreation() {

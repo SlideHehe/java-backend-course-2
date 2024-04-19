@@ -15,7 +15,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-class RateLimitTest {
+class RateLimitTest extends KafkaIntegrationTest {
     @Autowired
     MockMvc mockMvc;
     @Autowired

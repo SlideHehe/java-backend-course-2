@@ -14,7 +14,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-public class BotUpdatesServiceTest {
+class BotUpdatesServiceTest {
     @Mock
     Bot bot;
 

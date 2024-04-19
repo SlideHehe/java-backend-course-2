@@ -1,5 +1,6 @@
 package edu.java.scrapper.scheduler;
 
+import edu.java.scrapper.scheduler.linkupdater.LinkUpdater;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;

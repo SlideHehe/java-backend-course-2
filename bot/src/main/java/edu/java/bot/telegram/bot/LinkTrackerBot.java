@@ -9,6 +9,7 @@ import com.pengrad.telegrambot.request.SetMyCommands;
 import com.pengrad.telegrambot.response.BaseResponse;
 import edu.java.bot.telegram.command.Command;
 import edu.java.bot.telegram.command.CommandService;
+import io.micrometer.core.instrument.Counter;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import java.util.List;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Component;
 public class LinkTrackerBot implements Bot {
     private final TelegramBot telegramBot;
     private final CommandService commandService;
+    private final Counter processedMessagesCounter;
 
     @Override
     public <T extends BaseRequest<T, R>, R extends BaseResponse> void execute(BaseRequest<T, R> request) {
@@ -33,6 +35,8 @@ public class LinkTrackerBot implements Bot {
             if (updateValid(update)) {
                 SendMessage message = commandService.process(update);
                 execute(message);
+
+                processedMessagesCounter.increment();
             }
         }
 
