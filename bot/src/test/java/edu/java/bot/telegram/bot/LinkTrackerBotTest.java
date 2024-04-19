@@ -5,8 +5,8 @@ import com.pengrad.telegrambot.model.Chat;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
-import edu.java.bot.configuration.ApplicationConfig;
 import edu.java.bot.telegram.command.CommandService;
+import io.micrometer.core.instrument.Counter;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,13 +23,11 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class LinkTrackerBotTest {
     @Mock
-    CommandService commandService;
-
-    @Mock
-    ApplicationConfig applicationConfig;
-
-    @Mock
     TelegramBot telegramBot;
+    @Mock
+    CommandService commandService;
+    @Mock
+    Counter counter;
 
     @InjectMocks
     LinkTrackerBot linkTrackerBot;
